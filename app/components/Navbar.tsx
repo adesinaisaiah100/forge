@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,22 +11,9 @@ export default function Navbar() {
     <nav className="sticky top-0 z-50 w-full px-4 pt-4 pb-0">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between rounded-2xl bg-white/30 px-5 backdrop-blur-xl shadow-[0_8px_32px_-12px_rgba(15,23,42,0.15)] ring-1 ring-white/40 border border-white/30 md:rounded-full md:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5z" />
-              <path d="M2 17l10 5 10-5" />
-              <path d="M2 12l10 5 10-5" />
-            </svg>
+        <Link href="/" className="flex items-center gap-2 justify-center">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg ">
+           <Image src="/forge-icon.png" alt="Forge Logo" width={36} height={36} />
           </div>
           <span className="font-[family-name:var(--font-manrope)] text-xl font-bold text-heading">
             Forge
@@ -56,18 +44,18 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden items-center gap-4 md:flex">
-          <a
-            href="#"
+          <Link
+            href="/login"
             className="text-sm font-medium text-body transition-colors hover:text-heading"
           >
             Sign In
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/login"
             className="inline-flex h-10 items-center rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
           >
             Start an Idea
-          </a>
+          </Link>
         </div>
 
         {/* Mobile menu button */}
@@ -105,15 +93,16 @@ export default function Navbar() {
               What You Get
             </a>
             <hr className="border-[var(--color-border)]/70" />
-            <a href="#" className="text-sm font-medium text-body">
+            <Link href="/login" className="text-sm font-medium text-body" onClick={() => setMobileMenuOpen(false)}>
               Sign In
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              href="/login"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-hover"
+              onClick={() => setMobileMenuOpen(false)}
             >
               Start an Idea
-            </a>
+            </Link>
           </div>
         </div>
       )}

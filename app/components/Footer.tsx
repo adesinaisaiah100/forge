@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer className="border-t border-[var(--color-border)] bg-white py-12">
@@ -5,23 +7,10 @@ export default function Footer() {
         {/* Logo + tagline */}
         <div className="flex flex-col items-center gap-1 sm:items-start">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg">
+            <Image src="/forge-icon.png" alt="Forge Logo" width={66} height={66} />
             </div>
-            <span className="font-[family-name:var(--font-manrope)] text-lg font-bold text-heading">
+            <span className="font-[family-name:var(--font-manrope)] text-2xl font-bold text-heading">
               Forge
             </span>
           </div>
