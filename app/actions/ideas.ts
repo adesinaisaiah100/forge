@@ -26,6 +26,28 @@ export interface IdeaDocument extends IdeaInput {
 }
 
 // ──────────────────────────────────────────────
+// Helper — strips Appwrite class instance down to a plain object.
+// Server actions can only return plain serializable objects to
+// client components; Appwrite SDK returns class instances.
+// ──────────────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toPlainIdeaDoc(doc: any): IdeaDocument {
+  return {
+    $id: doc.$id,
+    $createdAt: doc.$createdAt,
+    $updatedAt: doc.$updatedAt,
+    userId: doc.userId,
+    idea: doc.idea,
+    targetUser: doc.targetUser,
+    problem: doc.problem,
+    alternatives: doc.alternatives,
+    timing: doc.timing,
+    founderFit: doc.founderFit,
+    stage: doc.stage,
+  };
+}
+
+// ──────────────────────────────────────────────
 // Submit Idea — saves the onboarding form to Appwrite DB
 // Called when user clicks "Finish" on the onboarding form.
 // ──────────────────────────────────────────────
@@ -56,7 +78,7 @@ export async function submitIdea(input: IdeaInput): Promise<IdeaDocument> {
     }
   );
 
-  return doc as unknown as IdeaDocument;
+  return toPlainIdeaDoc(doc);
 }
 
 // ──────────────────────────────────────────────
@@ -89,7 +111,7 @@ export async function getUserIdea(): Promise<IdeaDocument | null> {
 
     if (result.documents.length === 0) return null;
 
-    return result.documents[0] as unknown as IdeaDocument;
+    return toPlainIdeaDoc(result.documents[0]);
   } catch {
     return null;
   }
