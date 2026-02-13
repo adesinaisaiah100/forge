@@ -114,7 +114,7 @@ export default function WhatYouGet() {
              </p>
              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                  <a
-                   href="#"
+                   href="/onboarding"
                    className="inline-flex h-14 min-w-[200px] items-center justify-center rounded-full bg-primary px-8 text-lg font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/35"
                  >
                    Start Your First Idea

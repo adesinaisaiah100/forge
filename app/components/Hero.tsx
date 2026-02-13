@@ -145,7 +145,7 @@ export default function Hero() {
 
         <div className="flex flex-col gap-3 pt-1 sm:flex-row">
           <a
-            href="#"
+            href="/onboarding"
             className="inline-flex h-12 items-center justify-center rounded-full bg-primary px-7 text-base font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:-translate-y-0.5 hover:bg-primary-hover hover:shadow-xl hover:shadow-primary/35"
           >
             Start with an Idea

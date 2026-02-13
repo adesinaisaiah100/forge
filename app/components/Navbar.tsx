@@ -51,7 +51,7 @@ export default function Navbar() {
             Sign In
           </Link>
           <Link
-            href="/login"
+            href="/onboarding"
             className="inline-flex h-10 items-center rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover"
           >
             Start an Idea
@@ -97,7 +97,7 @@ export default function Navbar() {
               Sign In
             </Link>
             <Link
-              href="/login"
+              href="/onboarding"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-5 text-sm font-semibold text-white shadow-sm shadow-primary/20 transition-colors hover:bg-primary-hover"
               onClick={() => setMobileMenuOpen(false)}
             >
