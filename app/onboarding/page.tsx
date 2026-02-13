@@ -1,9 +1,12 @@
 ﻿"use client";
 
 import { useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
 import gsap from "gsap";
+import { submitIdea } from "@/app/actions/ideas";
+import { useIdeaStore } from "@/lib/stores/idea-store";
 
 // Step definitions
 const STEPS = [
@@ -72,11 +75,15 @@ const STAGES = [
 ];
 
 export default function OnboardingPage() {
+  const router = useRouter();
   const stepRef = useRef<HTMLDivElement>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Record<number, string>>({});
   const [stage, setStage] = useState<string | null>(null);
+  const setIdea = useIdeaStore((state) => state.setIdea);
 
   // Animate step transition
   const animateStep = useCallback(
@@ -118,9 +125,32 @@ export default function OnboardingPage() {
     if (currentStep > 0) animateStep("prev");
   };
 
-  const handleFinish = () => {
-    // placeholder  will wire to backend later
-    console.log("Form data:", formData, "Stage:", stage);
+  const handleFinish = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      const doc = await submitIdea({
+        idea: formData[0] || "",
+        targetUser: formData[1] || "",
+        problem: formData[2] || "",
+        alternatives: formData[3] || "",
+        timing: formData[4] || "",
+        founderFit: formData[5] || "",
+        stage: stage || "Just an idea",
+      });
+
+      // Cache in Zustand for instant access on dashboard
+      setIdea(doc);
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Something went wrong. Please try again."
+      );
+      setIsSubmitting(false);
+    }
   };
 
   const step = STEPS[currentStep];
@@ -280,14 +310,28 @@ export default function OnboardingPage() {
                   <ArrowRight className="h-4 w-4" />
                 </button>
               ) : (
-                <button
-                  onClick={handleFinish}
-                  disabled={isAnimating}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-secondary-hover disabled:opacity-50"
-                >
-                  Finish
-                  <Check className="h-4 w-4" />
-                </button>
+                <>
+                  <button
+                    onClick={handleFinish}
+                    disabled={isAnimating || isSubmitting}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-secondary-hover disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Submitting…
+                      </>
+                    ) : (
+                      <>
+                        Finish
+                        <Check className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+                  {submitError && (
+                    <p className="text-sm text-red-500">{submitError}</p>
+                  )}
+                </>
               )}
             </div>
           </div>
