@@ -10,7 +10,8 @@ import { NextRequest, NextResponse } from "next/server";
  * 1. Extracts userId from the URL
  * 2. Creates an Appwrite session via Appwrite REST (admin)
  * 3. Sets the session cookie directly on the redirect response
- * 4. Redirects to /dashboard
+ * 4. Checks if user has completed onboarding (has an idea in DB)
+ * 5. Redirects to /dashboard if onboarded, /onboarding if not
  */
 
 const SESSION_COOKIE = "forge-session";
@@ -51,8 +52,37 @@ export async function GET(request: NextRequest) {
 
     const session = (await res.json()) as { secret: string };
 
+    // Check if user has completed onboarding by looking for an idea in the DB
+    const DATABASE_ID = "forge-db";
+    const COLLECTION_ID = "ideas";
+
+    let hasIdea = false;
+    try {
+      const ideasRes = await fetch(
+        `${endpoint}/databases/${DATABASE_ID}/collections/${COLLECTION_ID}/documents?queries[]=${encodeURIComponent(JSON.stringify({ method: "equal", attribute: "userId", values: [userId] }))}&queries[]=${encodeURIComponent(JSON.stringify({ method: "limit", values: [1] }))}`,
+        {
+          method: "GET",
+          headers: {
+            "content-type": "application/json",
+            "x-appwrite-project": project,
+            "x-appwrite-key": apiKey,
+          },
+        }
+      );
+
+      if (ideasRes.ok) {
+        const ideasData = await ideasRes.json();
+        hasIdea = ideasData.total > 0;
+      }
+    } catch {
+      // If check fails, default to onboarding (safe fallback)
+      hasIdea = false;
+    }
+
+    const redirectPath = hasIdea ? "/dashboard" : "/onboarding";
+
     const response = NextResponse.redirect(
-      new URL("/dashboard", request.url)
+      new URL(redirectPath, request.url)
     );
 
     response.cookies.set(SESSION_COOKIE, session.secret, {
