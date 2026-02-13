@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { loginWithOAuth } from "@/app/actions/auth";
 
@@ -83,20 +84,28 @@ export default function LoginPage() {
 
 function LoginSkeleton() {
   return (
-    <div className="w-full max-w-md">
-      <div className="rounded-2xl border border-(--color-border) bg-white px-8 py-10 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.12)]">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-9 w-9 animate-pulse rounded-lg bg-primary/20" />
-          <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
-          <div className="h-4 w-64 animate-pulse rounded bg-gray-100" />
-          <div className="mt-4 flex w-full flex-col gap-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-12 w-full animate-pulse rounded-xl bg-gray-100" />
-            ))}
+    <>
+      {/* Left — skeleton form */}
+      <div className="flex w-full flex-col items-center justify-center px-6 py-12 sm:px-12 lg:w-1/2">
+        <div className="w-full max-w-md">
+          <div className="flex flex-col items-start gap-4">
+            <div className="h-9 w-9 animate-pulse rounded-lg bg-primary/20" />
+            <div className="h-6 w-48 animate-pulse rounded bg-gray-200" />
+            <div className="h-4 w-64 animate-pulse rounded bg-gray-100" />
+            <div className="mt-6 flex w-full flex-col gap-3">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-12 w-full animate-pulse rounded-xl bg-gray-100" />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {/* Right — image placeholder */}
+      <div className="hidden lg:block lg:w-1/2">
+        <div className="h-full w-full animate-pulse rounded-l-4xl bg-gray-200" />
+      </div>
+    </>
   );
 }
 
@@ -118,132 +127,131 @@ function LoginContent() {
   };
 
   return (
-    <div className="w-full max-w-md">
-      {/* Card */}
-      <div className="rounded-2xl border border-(--color-border) bg-white px-8 py-10 shadow-[0_8px_30px_-12px_rgba(15,23,42,0.12)]">
-        {/* Header */}
-        <div className="mb-8 text-center">
+    <>
+      {/* ── Left side — Login form ── */}
+      <div className="flex w-full flex-col justify-center px-6 py-12 sm:px-12 lg:w-1/2 lg:px-16 xl:px-24">
+        <div className="mx-auto w-full max-w-md">
           {/* Logo */}
-          <Link href="/" className="mb-6 inline-flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+          <Link href="/" className="mb-10 inline-flex items-center gap-2">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg">
+              <Image src="/forge-icon.png" alt="Forge Logo" width={36} height={36} />
             </div>
             <span className="font-(family-name:--font-manrope) text-xl font-bold text-heading">
               Forge
             </span>
           </Link>
 
-          <h1 className="font-(family-name:--font-manrope) text-2xl font-bold text-heading">
-            Welcome to Forge
+          {/* Heading */}
+          <h1 className="font-(family-name:--font-manrope) text-3xl font-bold tracking-tight text-heading">
+            Welcome back
           </h1>
           <p className="mt-2 text-sm text-muted">
             Sign in to turn your ideas into launch-ready MVPs.
           </p>
-        </div>
 
-        {/* Error message */}
-        {error && errorMessages[error] && (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            {errorMessages[error]}
+          {/* Error message */}
+          {error && errorMessages[error] && (
+            <div className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessages[error]}
+            </div>
+          )}
+
+          {/* OAuth buttons */}
+          <div className="mt-10 flex flex-col gap-3">
+            {providers.map((provider) => (
+              <button
+                key={provider.id}
+                onClick={() => handleOAuth(provider.id)}
+                disabled={loadingProvider !== null}
+                className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-full border border-(--color-border) bg-white text-sm font-medium text-heading transition-all hover:border-[#CBD5E1] hover:bg-[#F8FAFC] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {loadingProvider === provider.id ? (
+                  <svg
+                    className="h-5 w-5 animate-spin text-muted"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                ) : (
+                  provider.icon
+                )}
+                <span>Continue with {provider.name}</span>
+              </button>
+            ))}
           </div>
-        )}
 
-        {/* OAuth buttons */}
-        <div className="flex flex-col gap-3">
-          {providers.map((provider) => (
-            <button
-              key={provider.id}
-              onClick={() => handleOAuth(provider.id)}
-              disabled={loadingProvider !== null}
-              className="group relative flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-(--color-border) bg-white text-sm font-medium text-heading transition-all hover:border-[#CBD5E1] hover:bg-[#F8FAFC] hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+          {/* Divider */}
+          <div className="mt-8 flex items-center gap-3">
+            <div className="h-px flex-1 bg-(--color-border)" />
+            <span className="text-xs text-muted">No passwords needed</span>
+            <div className="h-px flex-1 bg-(--color-border)" />
+          </div>
+
+          {/* Footer note */}
+          <p className="mt-6 text-xs leading-relaxed text-muted">
+            By signing in, you agree to our{" "}
+            <Link href="/terms" className="text-primary underline-offset-2 hover:underline">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="text-primary underline-offset-2 hover:underline">
+              Privacy Policy
+            </Link>
+            .
+          </p>
+
+          {/* Back to home */}
+          <div className="mt-8">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-sm text-body transition-colors hover:text-heading"
             >
-              {loadingProvider === provider.id ? (
-                <svg
-                  className="h-5 w-5 animate-spin text-muted"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-              ) : (
-                provider.icon
-              )}
-              <span>
-                Continue with {provider.name}
-              </span>
-            </button>
-          ))}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5" />
+                <path d="M12 19l-7-7 7-7" />
+              </svg>
+              Back to home
+            </Link>
+          </div>
         </div>
-
-        {/* Divider */}
-        <div className="mt-8 flex items-center gap-3">
-          <div className="h-px flex-1 bg-(--color-border)" />
-          <span className="text-xs text-muted">No passwords needed</span>
-          <div className="h-px flex-1 bg-(--color-border)" />
-        </div>
-
-        {/* Footer note */}
-        <p className="mt-6 text-center text-xs leading-relaxed text-muted">
-          By signing in, you agree to our{" "}
-          <Link href="/terms" className="text-primary underline-offset-2 hover:underline">
-            Terms of Service
-          </Link>{" "}
-          and{" "}
-          <Link href="/privacy" className="text-primary underline-offset-2 hover:underline">
-            Privacy Policy
-          </Link>
-          .
-        </p>
       </div>
 
-      {/* Back to home */}
-      <p className="mt-6 text-center text-sm text-muted">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1 text-body transition-colors hover:text-heading"
-        >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5" />
-            <path d="M12 19l-7-7 7-7" />
-          </svg>
-          Back to home
-        </Link>
-      </p>
-    </div>
+      {/* ── Right side — Image ── */}
+      <div className="relative hidden lg:block lg:w-1/2">
+        <Image
+          src="/forge.jpg"
+          alt="Forge — hammer striking hot metal with sparks"
+          fill
+          priority
+          className="rounded-l-4xl object-cover"
+        />
+        {/* Overlay + inset shadow for depth */}
+        <div className="absolute inset-0 rounded-l-4xl bg-linear-to-t from-black/20 via-transparent to-black/5" />
+        <div className="absolute inset-0 rounded-l-4xl shadow-[inset_8px_0_24px_-12px_rgba(0,0,0,0.25)]" />
+      </div>
+    </>
   );
 }

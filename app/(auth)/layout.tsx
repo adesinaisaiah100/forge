@@ -1,6 +1,6 @@
 /**
  * Auth Layout — wraps /login (and future auth pages)
- * No Navbar or Footer — just centred content with a clean background.
+ * Split layout: form on the left, image on the right.
  */
 export default function AuthLayout({
   children,
@@ -8,7 +8,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[var(--color-bg-base)] px-4">
+    <div className="flex min-h-screen bg-[var(--color-bg-base)]">
       {children}
     </div>
   );
