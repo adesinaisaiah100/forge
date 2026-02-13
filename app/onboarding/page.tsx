@@ -220,7 +220,7 @@ export default function OnboardingPage() {
             </span>
           </div>
 
-          <div ref={stepRef} className="w-full max-w-3xl">
+          <div ref={stepRef} className="w-full max-w-2xl">
             {/* Welcome header  only on step 0 */}
             {currentStep === 0 && (
               <div className="mb-10">
