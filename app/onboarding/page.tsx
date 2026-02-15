@@ -159,7 +159,7 @@ export default function OnboardingPage() {
     <div className="relative min-h-screen bg-white">
       {isSubmitting && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-white/95">
-          <div className="w-64 h-64 md:w-80 md:h-80 rounded-2xl border border-slate-200 shadow-lg overflow-hidden bg-white">
+          <div className="w-64 h-64 md:w-80 md:h-80 overflow-hidden bg-white">
             <video
               src="/loadingvideo.mp4"
               autoPlay
