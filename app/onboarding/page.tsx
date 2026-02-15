@@ -157,6 +157,21 @@ export default function OnboardingPage() {
 
   return (
     <div className="relative min-h-screen bg-white">
+      {isSubmitting && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-white/95">
+          <div className="w-64 h-64 md:w-80 md:h-80 rounded-2xl border border-slate-200 shadow-lg overflow-hidden bg-white">
+            <video
+              src="/loadingvideo.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-full w-full object-cover"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Fixed logo */}
       <div className="fixed left-0 top-0 z-50 px-6 pt-6 sm:px-10 sm:pt-8">
         <div className="flex items-center gap-2 rounded-xl bg-white/70 px-3 py-2 backdrop-blur-md">
@@ -167,7 +182,7 @@ export default function OnboardingPage() {
             height={32}
             className="rounded-lg"
           />
-          <span className="font-[family-name:var(--font-manrope)] text-lg font-bold text-heading">
+          <span className="font-(family-name:--font-manrope) text-lg font-bold text-heading">
             Forge
           </span>
         </div>
@@ -176,7 +191,7 @@ export default function OnboardingPage() {
       {/* Full-screen form */}
       <div className="flex min-h-screen">
         {/* Progress chain  left side (hidden on mobile) */}
-        <div className="hidden w-20 flex-shrink-0 items-center justify-center py-16 sm:flex lg:w-28">
+        <div className="hidden w-20 shrink-0 items-center justify-center py-16 sm:flex lg:w-28">
           <div className="relative flex flex-col items-center gap-0">
             {STEPS.map((s, i) => (
               <div key={s.id} className="flex flex-col items-center">
@@ -191,7 +206,7 @@ export default function OnboardingPage() {
                       <span className="text-xs font-bold">{i}</span>
                     </div>
                   ) : (
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--color-border)] bg-white text-muted transition-all duration-300">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-(--color-border) bg-white text-muted transition-all duration-300">
                       <span className="text-xs font-medium">{i}</span>
                     </div>
                   )}
@@ -202,7 +217,7 @@ export default function OnboardingPage() {
                     className={`h-10 w-0.5 transition-colors duration-300 ${
                       i < currentStep
                         ? "bg-secondary"
-                        : "bg-[var(--color-border)]"
+                        : "bg-(--color-border)"
                     }`}
                   />
                 )}
@@ -229,7 +244,7 @@ export default function OnboardingPage() {
                   We&apos;ll walk you through a few focused questions to clarify
                   what you&apos;re building and why it matters.
                 </p>
-                <div className="mt-6 h-px w-full bg-[var(--color-border)]" />
+                <div className="mt-6 h-px w-full bg-(--color-border)" />
               </div>
             )}
 
@@ -239,7 +254,7 @@ export default function OnboardingPage() {
             </span>
 
             {/* Question */}
-            <h2 className="font-[family-name:var(--font-manrope)] text-2xl font-semibold leading-snug text-heading sm:text-3xl">
+            <h2 className="font-(family-name:--font-manrope) text-2xl font-semibold leading-snug text-heading sm:text-3xl">
               {step.question}
             </h2>
 
@@ -260,7 +275,7 @@ export default function OnboardingPage() {
                 }
                 placeholder={step.placeholder}
                 rows={4}
-                className="w-full resize-none rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-base)] px-5 py-4 text-base text-heading placeholder:text-muted/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="w-full resize-none rounded-xl border border-(--color-border) bg-background px-5 py-4 text-base text-heading placeholder:text-muted/60 transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
               />
             </div>
 
@@ -278,7 +293,7 @@ export default function OnboardingPage() {
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                         stage === s
                           ? "border-primary bg-primary/10 text-primary"
-                          : "border-[var(--color-border)] bg-white text-body hover:border-primary/40 hover:bg-primary/5"
+                          : "border-(--color-border) bg-white text-body hover:border-primary/40 hover:bg-primary/5"
                       }`}
                     >
                       {s}
@@ -294,7 +309,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleBack}
                   disabled={isAnimating}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-6 text-sm font-medium text-body transition-colors hover:bg-[var(--color-bg-base)] hover:text-heading disabled:opacity-50"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-(--color-border) bg-white px-6 text-sm font-medium text-body transition-colors hover:bg-background hover:text-heading disabled:opacity-50"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
