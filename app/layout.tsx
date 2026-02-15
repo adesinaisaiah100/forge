@@ -25,7 +25,7 @@ const adventPro = Advent_Pro({
 export const metadata: Metadata = {
   title: "Forge — From idea to real startup",
   description:
-    "Turn your startup idea into something real. Get honest feedback, define your MVP, and generate a pitch deck — all in one guided flow.",
+    "Turn your raw idea into a validated, build-ready startup. Forge evaluates, stress-tests, and evolves your concept into a venture-ready strategy",
   manifest: "/favicon/site.webmanifest",
   icons: {
     icon: [

@@ -104,7 +104,7 @@ export default function Hero() {
         </h1>
 
         <p className="max-w-2xl text-lg leading-relaxed text-body/80">
-          Describe your idea, get an honest verdict, define your MVP, and generate a pitch deck — all in one guided flow.
+          Evaluate your startup ideas, identify structural risks, score strategic viability, and track how changes impact your idea over time. Instead of guessing what to build, Forge helps you think, refine, and evolve with clarity.
         </p>
 
         <div className="flex flex-col gap-3 pt-1 sm:flex-row">
