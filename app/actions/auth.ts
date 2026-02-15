@@ -1,7 +1,7 @@
 "use server";
 
 import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { OAuthProvider } from "node-appwrite";
 
@@ -11,12 +11,39 @@ import { OAuthProvider } from "node-appwrite";
 const SESSION_COOKIE = "forge-session";
 const SESSION_DURATION = 60 * 60 * 24 * 30; // 30 days in seconds
 
+function normalizeBaseUrl(url: string): string {
+  return url.replace(/\/$/, "");
+}
+
+async function resolveAppBaseUrl(): Promise<string> {
+  const fallback = process.env.NEXT_PUBLIC_APP_URL;
+  const headerStore = await headers();
+
+  const host = headerStore.get("x-forwarded-host") ?? headerStore.get("host");
+  const proto = headerStore.get("x-forwarded-proto") ?? "https";
+
+  if (host) {
+    return normalizeBaseUrl(`${proto}://${host}`);
+  }
+
+  if (fallback) {
+    return normalizeBaseUrl(fallback);
+  }
+
+  if (process.env.VERCEL_URL) {
+    return normalizeBaseUrl(`https://${process.env.VERCEL_URL}`);
+  }
+
+  return "http://localhost:3000";
+}
+
 // ──────────────────────────────────────────────
 // OAuth — Initiate login
 // Called from the login page to redirect user to the OAuth provider
 // ──────────────────────────────────────────────
 export async function loginWithOAuth(provider: string) {
   const { account } = createAdminClient();
+  const appBaseUrl = await resolveAppBaseUrl();
 
   // Map string to Appwrite OAuthProvider enum
   const providerMap: Record<string, OAuthProvider> = {
@@ -34,8 +61,8 @@ export async function loginWithOAuth(provider: string) {
   // Appwrite generates the OAuth URL — we redirect the user there
   const redirectUrl = await account.createOAuth2Token(
     oauthProvider,
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/oauth/callback`, // success URL
-    `${process.env.NEXT_PUBLIC_APP_URL}/login?error=oauth_failed` // failure URL
+    `${appBaseUrl}/api/oauth/callback`, // success URL
+    `${appBaseUrl}/login?error=oauth_failed` // failure URL
   );
 
   redirect(redirectUrl);
