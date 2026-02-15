@@ -5,6 +5,7 @@ import type { NextRequest } from "next/server";
  * Middleware — Route Protection
  *
  * Runs BEFORE any page renders. Checks for the session cookie:
+ * - Home route (/) → redirect to /dashboard if already logged in
  * - Protected routes (/dashboard/*, /onboarding) → redirect to /login if no session
  * - Auth routes (/login) → redirect to /dashboard if already logged in
  *
@@ -16,9 +17,15 @@ export function middleware(request: NextRequest) {
   const session = request.cookies.get("forge-session");
   const { pathname } = request.nextUrl;
 
+  const isHomeRoute = pathname === "/";
   const isProtectedRoute =
     pathname.startsWith("/dashboard") || pathname.startsWith("/onboarding");
   const isAuthRoute = pathname === "/login";
+
+  // Has session + visiting landing page → skip straight to dashboard
+  if (isHomeRoute && session) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
   // No session + trying to access protected route → go to login
   if (isProtectedRoute && !session) {
@@ -39,5 +46,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/login"],
+  matcher: ["/", "/dashboard/:path*", "/onboarding/:path*", "/login"],
 };
