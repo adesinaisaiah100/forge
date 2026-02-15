@@ -8,41 +8,6 @@ import Image from "next/image";
 
 gsap.registerPlugin(useGSAP, MotionPathPlugin);
 
-const steps = [
-  {
-    num: "1",
-    title: "Rough Idea",
-    desc: "Turn your raw idea into a clear problem by identifying who it’s for, what hurts, and why it matters now.",
-    badgeBg: "bg-primary/15",
-    badgeText: "text-primary",
-    hoverBg: "group-hover:bg-primary/25",
-  },
-  {
-    num: "2",
-    title: "Validation",
-    desc: "Pressure-test the idea by looking at real demand, existing alternatives, and whether this is worth pursuing.",
-    badgeBg: "bg-emerald-100",
-    badgeText: "text-emerald-600",
-    hoverBg: "group-hover:bg-emerald-200",
-  },
-  {
-    num: "3",
-    title: "MVP Plan",
-    desc: "Decide what to build first by defining a focused MVP that’s small enough to ship and learn from.",
-    badgeBg: "bg-sky-100",
-    badgeText: "text-sky-600",
-    hoverBg: "group-hover:bg-sky-200",
-  },
-  {
-    num: "4",
-    title: "Pitch & Launch",
-    desc: "Turn your idea into a clear story with a pitch deck and concrete next steps to share and launch.",
-    badgeBg: "bg-gradient-to-r from-[#2563EB] to-[#10B981]",
-    badgeText: "text-white shadow-sm",
-    hoverBg: "",
-  },
-];
-
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -51,7 +16,6 @@ export default function Hero() {
       if (!containerRef.current) return;
 
       const connectors = containerRef.current.querySelectorAll("[data-connector]");
-      const badges = containerRef.current.querySelectorAll("[data-badge]");
       const cards = containerRef.current.querySelectorAll("[data-card]");
 
       if (!connectors.length || !cards.length) return;
@@ -126,14 +90,14 @@ export default function Hero() {
 
       {/* Content — centered column */}
       <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-1 flex-col items-center justify-center gap-5 px-6 pt-8 pb-4 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-3 py-1 text-xs font-semibold text-body/80 shadow-sm ring-1 ring-[var(--color-border)]/70 backdrop-blur">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-3 py-1 text-xs font-semibold text-body/80 shadow-sm ring-1 ring-border/70 backdrop-blur">
           <span className="h-2 w-2 rounded-full bg-primary" />
           Idea to MVP, guided.
         </div>
 
-        <h1 className="font-[family-name:var(--font-manrope)] text-4xl font-extrabold leading-tight tracking-tight text-heading sm:text-5xl lg:text-6xl">
+        <h1 className="font-(family-name:--font-manrope) text-4xl font-extrabold leading-tight tracking-tight text-heading sm:text-5xl lg:text-6xl">
           Turn messy idea into a{' '}
-          <span className="bg-gradient-to-r from-[#2563EB] to-[#10B981] bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
             launch-ready
           </span>{' '}
           product story.
@@ -152,7 +116,7 @@ export default function Hero() {
           </a>
           <a
             href="#how-it-works"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-[var(--color-border)] px-7 text-base font-semibold text-body transition-all hover:-translate-y-0.5 hover:bg-white/80 hover:shadow-sm hover:ring-1 hover:ring-[var(--color-border)]"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-(--color-border) px-7 text-base font-semibold text-body transition-all hover:-translate-y-0.5 hover:bg-white/80 hover:shadow-sm hover:ring-1 hover:ring-(--color-border)"
           >
             See How It Works
           </a>
@@ -160,9 +124,9 @@ export default function Hero() {
 
         <div className="flex items-center gap-3 pt-1 text-sm text-muted">
           <div className="flex -space-x-3">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-primary/80 to-primary/60 text-[10px] font-bold text-white shadow ring-2 ring-white">A</span>
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-500 text-[10px] font-bold text-white shadow ring-2 ring-white">B</span>
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-[10px] font-bold text-white shadow ring-2 ring-white">C</span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-primary/80 to-primary/60 text-[10px] font-bold text-white shadow ring-2 ring-white">A</span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-emerald-500 text-[10px] font-bold text-white shadow ring-2 ring-white">B</span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br from-sky-400 to-blue-500 text-[10px] font-bold text-white shadow ring-2 ring-white">C</span>
           </div>
           <span className="text-body/80">Guided by founders, PMs, and designers who ship.</span>
         </div>

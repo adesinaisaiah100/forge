@@ -8,7 +8,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen bg-[var(--color-bg-base)]">
+    <div className="flex min-h-screen bg-background">
       {children}
     </div>
   );
