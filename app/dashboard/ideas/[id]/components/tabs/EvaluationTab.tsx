@@ -14,18 +14,26 @@ import {
     DollarSign,
     ArrowRight
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   data: RawAggregatorOutput["score_breakdown"];
   raw_reports: CompleteEvaluation["raw_reports"];
+    isFirstRun?: boolean;
 }
 
 type DimensionKey = keyof RawAggregatorOutput["score_breakdown"];
 
-export function EvaluationTab({ data, raw_reports }: Props) {
+export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) {
   const [selectedDimension, setSelectedDimension] = useState<DimensionKey>('problem_strength');
+    const [showFirstRunSkeleton, setShowFirstRunSkeleton] = useState(isFirstRun);
+
+    useEffect(() => {
+        if (!isFirstRun) return;
+        const timer = setTimeout(() => setShowFirstRunSkeleton(false), 800);
+        return () => clearTimeout(timer);
+    }, [isFirstRun]);
 
   const dimensions: { key: DimensionKey; label: string; icon: React.ElementType }[] = [
     { key: 'problem_strength', label: 'Problem Strength', icon: Target },
@@ -92,27 +100,54 @@ export function EvaluationTab({ data, raw_reports }: Props) {
 
          {/* Right Column: Deep Dive Panel (7 cols) */}
          <div className="lg:col-span-7">
-             <AnimatePresence mode="wait">
-                 <motion.div
-                    key={selectedDimension}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.2 }}
-                    className="h-full rounded-3xl border border-slate-200 bg-white p-8 shadow-sm flex flex-col"
-                 >
-                    <DeepDiveContent 
-                        dimension={selectedDimension} 
-                        scoreData={data[selectedDimension]} 
-                        reports={raw_reports} 
-                    />
-                 </motion.div>
-             </AnimatePresence>
+             {showFirstRunSkeleton ? (
+                <DeepDiveSkeleton />
+             ) : (
+               <AnimatePresence mode="wait">
+                   <motion.div
+                      key={selectedDimension}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.2 }}
+                      className="h-full rounded-3xl border border-slate-200 bg-white p-8 shadow-sm flex flex-col"
+                   >
+                      <DeepDiveContent 
+                          dimension={selectedDimension} 
+                          scoreData={data[selectedDimension]} 
+                          reports={raw_reports} 
+                      />
+                   </motion.div>
+               </AnimatePresence>
+             )}
          </div>
 
       </div>
     </div>
   );
+}
+
+function DeepDiveSkeleton() {
+    return (
+        <div className="h-full rounded-3xl border border-slate-200 bg-white p-8 shadow-sm flex flex-col">
+            <div className="mb-6 border-b border-slate-100 pb-6">
+                <div className="h-10 w-24 animate-pulse rounded bg-slate-200" />
+                <div className="mt-3 h-5 w-full animate-pulse rounded bg-slate-100" />
+                <div className="mt-2 h-5 w-4/5 animate-pulse rounded bg-slate-100" />
+            </div>
+            <div className="space-y-4">
+                {[...Array(4)].map((_, index) => (
+                    <div key={index} className="rounded-xl border border-slate-100 bg-slate-50 p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="h-4 w-28 animate-pulse rounded bg-slate-200" />
+                            <div className="h-4 w-24 animate-pulse rounded bg-slate-200" />
+                        </div>
+                        <div className="mt-3 h-3 w-full animate-pulse rounded bg-slate-100" />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 
 // --- Subcomponent: Content Router ---

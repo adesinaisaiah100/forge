@@ -26,6 +26,7 @@ export default async function IdeaWorkspacePage({ params }: Props) {
   }
 
   const { currentVersion, currentEvaluation } = ideaData;
+  const isFirstRunEvaluation = !currentEvaluation;
 
   // 2. Determine if we need to run the AI pipeline
   let evaluation: CompleteEvaluation;
@@ -81,6 +82,7 @@ export default async function IdeaWorkspacePage({ params }: Props) {
       currentVersion={currentVersion}
       mvpPlan={ideaData.currentMVPPlan}
       featureSimulations={ideaData.featureSimulations}
+      isFirstRunEvaluation={isFirstRunEvaluation}
     />
   );
 }
