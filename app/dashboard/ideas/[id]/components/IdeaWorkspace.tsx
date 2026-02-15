@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   LayoutGrid, 
   Activity, 
@@ -23,6 +23,7 @@ import { EvaluationTab } from "./tabs/EvaluationTab";
 import { RisksTab } from "./tabs/RisksTab";
 import { MVPTab } from "./tabs/MVPTab";
 import { FeatureLabTab } from "./tabs/FeatureLabTab";
+import { Skeleton, SkeletonText } from "./Skeletons";
 
 interface Props {
   idea: IdeaDocument;
@@ -31,13 +32,19 @@ interface Props {
   currentVersion: IdeaVersion | null;
   mvpPlan: StoredMVPPlan | null;
   featureSimulations: StoredFeatureSimulation[];
+  isFirstRunEvaluation?: boolean;
 }
 
 export type TabId = 'overview' | 'evaluation' | 'risks' | 'mvp' | 'feature-lab' | 'evolution';
 
-export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations }: Props) {
+export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations, isFirstRunEvaluation = false }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [mvpPlan, setMvpPlan] = useState<StoredMVPPlan | null>(initialMVPPlan);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const versionNumber = currentVersion?.versionNumber ?? 1;
 
@@ -110,32 +117,51 @@ export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpP
 
           {/* Bottom — Score Summary */}
           <div className="p-4 border-t border-slate-100 space-y-3">
-             <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">Forge Score</span>
-                <span className={cn(
-                  "font-bold text-lg",
-                  evaluation.overall_assessment.total_score >= 70 ? "text-emerald-600" :
-                  evaluation.overall_assessment.total_score >= 50 ? "text-amber-600" :
-                  "text-rose-600"
-                )}>
-                  {evaluation.overall_assessment.total_score}
-                </span>
-             </div>
-             <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">Verdict</span>
-                <span className={cn(
-                  "font-bold uppercase text-xs px-2 py-0.5 rounded-full",
-                  evaluation.overall_assessment.verdict === "GO" ? "bg-emerald-100 text-emerald-700" :
-                  evaluation.overall_assessment.verdict === "REFINE" ? "bg-amber-100 text-amber-700" :
-                  "bg-rose-100 text-rose-700"
-                )}>
-                  {evaluation.overall_assessment.verdict}
-                </span>
-             </div>
-             <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">Versions</span>
-                <span className="text-slate-700 font-medium">{versions.length}</span>
-             </div>
+             {isHydrated ? (
+               <>
+                 <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-medium">Forge Score</span>
+                    <span className={cn(
+                      "font-bold text-lg",
+                      evaluation.overall_assessment.total_score >= 70 ? "text-emerald-600" :
+                      evaluation.overall_assessment.total_score >= 50 ? "text-amber-600" :
+                      "text-rose-600"
+                    )}>
+                      {evaluation.overall_assessment.total_score}
+                    </span>
+                 </div>
+                 <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-medium">Verdict</span>
+                    <span className={cn(
+                      "font-bold uppercase text-xs px-2 py-0.5 rounded-full",
+                      evaluation.overall_assessment.verdict === "GO" ? "bg-emerald-100 text-emerald-700" :
+                      evaluation.overall_assessment.verdict === "REFINE" ? "bg-amber-100 text-amber-700" :
+                      "bg-rose-100 text-rose-700"
+                    )}>
+                      {evaluation.overall_assessment.verdict}
+                    </span>
+                 </div>
+                 <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-medium">Versions</span>
+                    <span className="text-slate-700 font-medium">{versions.length}</span>
+                 </div>
+               </>
+             ) : (
+               <div className="space-y-3">
+                 <div className="flex items-center justify-between">
+                   <SkeletonText className="h-3 w-16" />
+                   <Skeleton className="h-6 w-10" />
+                 </div>
+                 <div className="flex items-center justify-between">
+                   <SkeletonText className="h-3 w-14" />
+                   <Skeleton className="h-5 w-16 rounded-full" />
+                 </div>
+                 <div className="flex items-center justify-between">
+                   <SkeletonText className="h-3 w-12" />
+                   <Skeleton className="h-4 w-6" />
+                 </div>
+               </div>
+             )}
           </div>
         </div>
       </aside>
@@ -152,7 +178,13 @@ export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpP
                 transition={{ duration: 0.2 }}
              >
                 {activeTab === 'overview' && <OverviewTab evaluation={evaluation} moveToTab={setActiveTab} />}
-                {activeTab === 'evaluation' && <EvaluationTab data={evaluation.score_breakdown} raw_reports={evaluation.raw_reports} />}
+                {activeTab === 'evaluation' && (
+                  <EvaluationTab
+                    data={evaluation.score_breakdown}
+                    raw_reports={evaluation.raw_reports}
+                    isFirstRun={isFirstRunEvaluation}
+                  />
+                )}
                 {activeTab === 'risks' && <RisksTab risks={evaluation.risk_profile} />}
                 
                 {/* Phase 2: MVP Plan */}
