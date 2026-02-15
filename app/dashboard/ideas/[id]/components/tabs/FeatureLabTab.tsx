@@ -16,6 +16,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { StoredFeatureSimulation } from "@/lib/ai/types";
+import { Skeleton, SkeletonCircle, SkeletonText } from "../Skeletons";
 
 // ──────────────────────────────────────────────
 // Props
@@ -355,6 +356,9 @@ export function FeatureLabTab({ simulations: initialSimulations, ideaVersionId, 
       </motion.div>
 
       {/* Simulations List */}
+      {isSimulating && (
+        <SimulationSkeleton />
+      )}
       {simulations.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 py-12 text-center">
           <div className="rounded-full bg-white p-3 shadow-sm">
@@ -377,6 +381,30 @@ export function FeatureLabTab({ simulations: initialSimulations, ideaVersionId, 
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function SimulationSkeleton() {
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center gap-4 mb-4">
+        <SkeletonCircle className="h-12 w-12" />
+        <div className="flex-1 space-y-2">
+          <SkeletonText className="h-4 w-48" />
+          <SkeletonText className="h-3 w-64" />
+        </div>
+        <Skeleton className="h-6 w-20 rounded-full" />
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 space-y-2">
+            <SkeletonText className="h-3 w-20" />
+            <SkeletonText className="h-3 w-16" />
+            <SkeletonText className="h-3 w-full" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { StoredMVPPlan } from "@/lib/ai/types";
+import { Skeleton, SkeletonCircle, SkeletonText } from "../Skeletons";
 
 interface Props {
   mvpPlan: StoredMVPPlan | null;
@@ -46,6 +47,10 @@ export function MVPTab({
       setIsGenerating(false);
     }
   };
+
+  if (isGenerating && !mvpPlan) {
+    return <MVPSkeleton />;
+  }
 
   // ── Empty State: No MVP Plan yet ──
   if (!mvpPlan) {
@@ -381,6 +386,62 @@ export function MVPTab({
             ))}
           </ul>
         </motion.div>
+      </div>
+    </div>
+  );
+}
+
+function MVPSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <SkeletonText className="h-5 w-32" />
+        <SkeletonText className="mt-2 h-4 w-64" />
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <SkeletonCircle className="h-10 w-10" />
+            <SkeletonText className="h-4 w-32" />
+          </div>
+          <SkeletonText className="h-4 w-full" />
+          <SkeletonText className="h-4 w-5/6" />
+          <SkeletonText className="h-4 w-2/3" />
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+          <div className="flex items-center gap-3">
+            <SkeletonCircle className="h-10 w-10" />
+            <SkeletonText className="h-4 w-28" />
+          </div>
+          <SkeletonText className="h-4 w-full" />
+          <SkeletonText className="h-4 w-4/5" />
+          <SkeletonText className="h-4 w-2/3" />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-3">
+          <SkeletonCircle className="h-10 w-10" />
+          <div>
+            <SkeletonText className="h-4 w-32" />
+            <SkeletonText className="mt-2 h-3 w-24" />
+          </div>
+        </div>
+        <SkeletonText className="h-4 w-full" />
+        <SkeletonText className="h-4 w-5/6" />
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+            <SkeletonText className="h-3 w-24" />
+            <SkeletonText className="h-3 w-full" />
+            <SkeletonText className="h-3 w-4/5" />
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-2">
+            <SkeletonText className="h-3 w-24" />
+            <SkeletonText className="h-3 w-full" />
+            <SkeletonText className="h-3 w-4/5" />
+          </div>
+        </div>
       </div>
     </div>
   );
