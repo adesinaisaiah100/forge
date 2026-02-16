@@ -15,17 +15,17 @@ export default async function DashboardPage() {
     <div className="min-h-screen bg-slate-50/50">
       {/* Header */}
       <header className="border-b border-slate-200 bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full items-center justify-between px-6 py-4">
-          <div className="flex gap-1 justify-center items-center">
+        <div className="mx-auto flex w-full flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div className="flex items-center justify-center gap-1 sm:justify-start">
             
             <Image src="/forgeicon.png" alt="icon" width={42} height={42} />
              <h1 className="text-xl font-bold text-slate-900">Forge</h1>
         
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
             <Link
               href="/onboarding"
-              className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:flex-none"
             >
               <Plus className="h-4 w-4" />
               New Idea
@@ -36,7 +36,7 @@ export default async function DashboardPage() {
       </header>
 
       {/* Content */}
-      <main className="mx-auto w-full px-6 py-10">
+      <main className="mx-auto w-full px-4 py-8 sm:px-6 sm:py-10">
         <Suspense fallback={<IdeasGridSkeleton />}>
           <IdeasContent />
         </Suspense>
@@ -71,7 +71,7 @@ async function IdeasContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-bold text-slate-900">Your Ideas</h2>
         <span className="text-sm text-slate-500">{ideas.length} idea{ideas.length !== 1 ? "s" : ""}</span>
       </div>
