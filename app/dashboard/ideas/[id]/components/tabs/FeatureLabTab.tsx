@@ -109,7 +109,7 @@ function SimulationCard({ sim }: { sim: StoredFeatureSimulation }) {
       {/* Summary Row */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-4 p-5 text-left hover:bg-slate-50/50 transition-colors"
+        className="flex w-full items-center gap-3 p-4 text-left transition-colors hover:bg-slate-50/50 sm:gap-4 sm:p-5"
       >
         {/* Net Score Badge */}
         <div
@@ -139,7 +139,7 @@ function SimulationCard({ sim }: { sim: StoredFeatureSimulation }) {
         {/* Recommendation Badge */}
         <span
           className={cn(
-            "shrink-0 inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold",
+            "hidden shrink-0 items-center rounded-full border px-2.5 py-1 text-xs font-bold sm:inline-flex",
             recStyle.bg,
             recStyle.text,
             recStyle.border
@@ -170,7 +170,7 @@ function SimulationCard({ sim }: { sim: StoredFeatureSimulation }) {
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="border-t border-slate-100 p-5 space-y-5">
+            <div className="space-y-5 border-t border-slate-100 p-4 sm:p-5">
               {/* Strategic Impact */}
               <div>
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
@@ -325,7 +325,7 @@ export function FeatureLabTab({ simulations: initialSimulations, ideaVersionId, 
             </div>
           )}
 
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-xs text-slate-400">
               {simulations.length} simulation{simulations.length !== 1 ? "s" : ""} run
             </span>
@@ -333,7 +333,7 @@ export function FeatureLabTab({ simulations: initialSimulations, ideaVersionId, 
               onClick={handleSimulate}
               disabled={isSimulating || !featureInput.trim() || !ideaVersionId}
               className={cn(
-                "inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-all",
+                  "inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold shadow-sm transition-all sm:w-auto",
                 isSimulating || !featureInput.trim()
                   ? "bg-slate-200 text-slate-400 cursor-not-allowed"
                   : "bg-slate-900 text-white hover:-translate-y-0.5 hover:shadow-md"

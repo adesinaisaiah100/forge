@@ -19,7 +19,7 @@ export function OverviewTab({ evaluation, moveToTab }: Props) {
       <div className="grid gap-6 md:grid-cols-2">
          {/* Introduction */}
          <div className="space-y-4">
-             <h2 className="text-3xl font-bold tracking-tight text-slate-900">
+             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
                 Mission Control
              </h2>
              <p className="text-lg text-slate-600 leading-relaxed">
@@ -28,10 +28,10 @@ export function OverviewTab({ evaluation, moveToTab }: Props) {
          </div>
 
          {/* Hero Score Card */}
-         <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/10">
+         <div className="relative overflow-hidden rounded-3xl bg-slate-900 p-6 text-white shadow-2xl shadow-slate-900/10 sm:p-8">
             <div className="relative z-10 flex flex-col items-center justify-center text-center h-full space-y-2">
                  <div className="text-xs font-bold uppercase tracking-widest opacity-50">Forge Score</div>
-                 <div className="text-7xl font-black tracking-tighter">
+                 <div className="text-6xl font-black tracking-tighter sm:text-7xl">
                     {overall_assessment.total_score}
                  </div>
                  <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-sm font-medium backdrop-blur-sm">
@@ -47,18 +47,18 @@ export function OverviewTab({ evaluation, moveToTab }: Props) {
       </div>
 
       {/* 2. Progress Tracker */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+       <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
            <div className="flex items-center justify-between text-sm font-medium text-slate-500 mb-4">
                <span>Lifecycle Status</span>
                <span>Stage 2 of 5</span>
            </div>
            
-           <div className="relative">
+          <div className="relative overflow-x-auto pb-2">
                 {/* Connecting Line */}
-                <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 h-1 bg-slate-100 rounded-full" />
+             <div className="absolute top-1/2 left-0 hidden h-1 min-w-130 -translate-y-1/2 rounded-full bg-slate-100 sm:block sm:w-full" />
                 
                 {/* Steps */}
-                <div className="relative z-10 flex w-full justify-between">
+             <div className="relative z-10 flex min-w-130 justify-between sm:min-w-0 sm:w-full">
                      {[
                         { label: "Concept", status: "complete" },
                         { label: "Evaluation", status: "complete" },

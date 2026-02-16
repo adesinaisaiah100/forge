@@ -17,7 +17,8 @@ import {
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { StoredMVPPlan } from "@/lib/ai/types";
-import { Skeleton, SkeletonCircle, SkeletonText } from "../Skeletons";
+import { SkeletonCircle, SkeletonText } from "../Skeletons";
+import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 
 interface Props {
   mvpPlan: StoredMVPPlan | null;
@@ -32,6 +33,7 @@ export function MVPTab({
 }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { isMobile } = useBreakpoints();
 
   const handleGenerate = async () => {
     if (!ideaVersionId) return;
@@ -145,7 +147,7 @@ export function MVPTab({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">MVP Plan</h2>
           <p className="text-slate-500">
@@ -165,7 +167,7 @@ export function MVPTab({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-white p-6 shadow-sm"
+          className="rounded-2xl border border-blue-100 bg-linear-to-br from-blue-50 to-white p-6 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
@@ -183,7 +185,7 @@ export function MVPTab({
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-rose-100 bg-gradient-to-br from-rose-50 to-white p-6 shadow-sm"
+          className="rounded-2xl border border-rose-100 bg-linear-to-br from-rose-50 to-white p-6 shadow-sm"
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-rose-600">
@@ -259,7 +261,7 @@ export function MVPTab({
             Every feature must earn its place.
           </p>
         </div>
-        <div className="mt-4">
+        {!isMobile ? <div className="mt-4">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-slate-100 text-left">
@@ -322,7 +324,44 @@ export function MVPTab({
               })}
             </tbody>
           </table>
-        </div>
+        </div> : <div className="mt-4 space-y-3 px-4 pb-4">
+          {mvpPlan.featurePrioritization.map((item, i) => {
+            const style = priorityStyles[item.priority] ?? {
+              bg: "bg-slate-50",
+              text: "text-slate-600",
+              border: "border-slate-200",
+            };
+            return (
+              <div key={i} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-medium text-slate-900">{item.feature}</p>
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold",
+                      style.bg,
+                      style.text,
+                      style.border
+                    )}
+                  >
+                    {item.priority}
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs">
+                  <span className="text-slate-500">Effort</span>
+                  <span
+                    className={cn(
+                      "font-bold",
+                      effortStyles[item.effort_estimate] ?? "text-slate-500"
+                    )}
+                  >
+                    {item.effort_estimate}
+                  </span>
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500">{item.rationale}</p>
+              </div>
+            );
+          })}
+        </div>}
       </motion.div>
 
       {/* 4. Build Order + What to Ignore — side by side */}

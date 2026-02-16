@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 
 interface Props {
   data: RawAggregatorOutput["score_breakdown"];
@@ -28,6 +29,7 @@ type DimensionKey = keyof RawAggregatorOutput["score_breakdown"];
 export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) {
   const [selectedDimension, setSelectedDimension] = useState<DimensionKey>('problem_strength');
     const [showFirstRunSkeleton, setShowFirstRunSkeleton] = useState(isFirstRun);
+    const { isMobile } = useBreakpoints();
 
     useEffect(() => {
         if (!isFirstRun) return;
@@ -51,10 +53,10 @@ export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) 
         <p className="text-slate-500">Click on any dimension to reveal the raw data from the agent network.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+    <div className="grid h-full grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
          
          {/* Left Column: Chart & Navigation (5 cols) */}
-         <div className="lg:col-span-5 space-y-6">
+         <div className="space-y-4 lg:col-span-5 lg:space-y-6">
              {/* Simple Selection List */}
              <div className="rounded-2xl border border-slate-200 bg-white p-2">
                  {dimensions.map((dim) => (
@@ -86,7 +88,7 @@ export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) 
              </div>
 
              {/* Radar Chart Review */}
-             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm flex flex-col items-center justify-center">
+             {!isMobile && <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                  <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4 self-start">Visual Mix</h4>
                  <div className="w-full h-62.5 max-w-75">
                     <AssessmentRadarChart 
@@ -95,7 +97,7 @@ export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) 
                         onDimensionSelect={setSelectedDimension}
                     />
                  </div>
-             </div>
+             </div>}
          </div>
 
          {/* Right Column: Deep Dive Panel (7 cols) */}
@@ -110,7 +112,7 @@ export function EvaluationTab({ data, raw_reports, isFirstRun = false }: Props) 
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}
                       transition={{ duration: 0.2 }}
-                      className="h-full rounded-3xl border border-slate-200 bg-white p-8 shadow-sm flex flex-col"
+                             className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 lg:p-8"
                    >
                       <DeepDiveContent 
                           dimension={selectedDimension} 
@@ -325,7 +327,7 @@ function DeepDiveContent({ dimension, scoreData, reports }: { dimension: Dimensi
 
 function DataItem({ label, value }: { label: string; value: string }) {
     return (
-        <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-100">
+        <div className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
             <span className="text-slate-500 font-medium">{label}</span>
             <span className="text-slate-900 font-bold">{value}</span>
         </div>
