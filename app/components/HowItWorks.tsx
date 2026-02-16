@@ -23,29 +23,29 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="bg-[var(--color-bg-base)] py-24">
+    <section id="how-it-works" className="bg-background py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-6">
         {/* Section header */}
-        <div className="mb-16 text-center">
+        <div className="mb-12 text-center sm:mb-16">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-primary">
             How it Works
           </p>
-          <h2 className="font-[family-name:var(--font-manrope)] text-3xl font-bold text-heading sm:text-4xl">
+          <h2 className="font-(family-name:--font-manrope) text-3xl font-bold text-heading sm:text-4xl">
             A simple path from idea to action
           </h2>
         </div>
 
         {/* Cards */}
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
           {steps.map((step, i) => (
             <div
               key={i}
-              className="group relative  rounded-2xl border border-[var(--color-border)] bg-white p-8 pl-14 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+              className="group relative rounded-2xl border border-(--color-border) bg-white p-6 pl-10 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md sm:p-8 sm:pl-14"
             >
-              <span className="absolute -left-5 top-0 -translate-y-1/2 text-7xl font-black leading-none bg-gradient-to-br from-[#2563EB] to-[#10B981] bg-clip-text text-transparent  select-none">
+              <span className="absolute -left-3 top-0 -translate-y-1/2 select-none bg-linear-to-br from-primary to-secondary bg-clip-text text-6xl leading-none font-black text-transparent sm:-left-5 sm:text-7xl">
                 {i + 1}
               </span>
-              <h3 className="font-[family-name:var(--font-manrope)] text-lg font-bold text-heading">
+              <h3 className="font-(family-name:--font-manrope) text-lg font-bold text-heading">
                 {step.title}
               </h3>
               <p className="mt-2 leading-relaxed text-body">
@@ -59,7 +59,7 @@ export default function HowItWorks() {
         </div>
 
         {/* Flow indicator */}
-        <div className="mt-12 flex items-center justify-center gap-4 text-sm font-medium text-muted">
+        <div className="mt-10 hidden items-center justify-center gap-4 text-sm font-medium text-muted sm:flex">
           <span className="rounded-full bg-blue-50 px-4 py-1.5 text-primary">
             Describe
           </span>

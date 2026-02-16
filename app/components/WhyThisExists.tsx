@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function WhyThisExists() {
   return (
-    <section className="relative overflow-hidden bg-white py-28">
+    <section className="relative overflow-hidden bg-white py-20 sm:py-28">
       {/* Left image — chaos/ideas */}
       <div className="pointer-events-none absolute left-20 top-1/2 -translate-y-1/2 hidden lg:block">
         <Image src="/chaosideas.png" alt="" width={290} height={290} className="opacity-80" />
@@ -20,12 +20,12 @@ export default function WhyThisExists() {
         </p>
 
         {/* Hero statement */}
-        <h2 className="font-[family-name:var(--font-manrope)] text-3xl font-extrabold leading-tight text-heading sm:text-6xl">
+        <h2 className="font-(family-name:--font-manrope) text-3xl font-extrabold leading-tight text-heading sm:text-6xl">
           The world doesn&apos;t need more ideas.
         </h2>
-        <h2 className="mt-1 font-[family-name:var(--font-manrope)] text-3xl font-extrabold leading-tight sm:text-6xl">
+        <h2 className="mt-1 font-(family-name:--font-manrope) text-3xl font-extrabold leading-tight sm:text-6xl">
           It needs{" "}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
             clearer ones.
           </span>
         </h2>
@@ -58,9 +58,9 @@ export default function WhyThisExists() {
         </div>
 
         {/* Final punch line */}
-        <p className="mt-14 font-[family-name:var(--font-manrope)] text-2xl font-extrabold tracking-tight text-heading sm:text-3xl">
+        <p className="mt-12 font-(family-name:--font-manrope) text-2xl font-extrabold tracking-tight text-heading sm:mt-14 sm:text-3xl">
           It&apos;s{" "}
-          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
             decisions.
           </span>
         </p>

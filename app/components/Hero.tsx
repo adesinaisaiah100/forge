@@ -5,14 +5,17 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import Image from "next/image";
+import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 
 gsap.registerPlugin(useGSAP, MotionPathPlugin);
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isMobile } = useBreakpoints();
 
   useGSAP(
     () => {
+      if (isMobile) return;
       if (!containerRef.current) return;
 
       const connectors = containerRef.current.querySelectorAll("[data-connector]");
@@ -80,7 +83,7 @@ export default function Hero() {
         }
       });
     },
-    { scope: containerRef, dependencies: [] }
+    { scope: containerRef, dependencies: [isMobile] }
   );
 
   return (
@@ -133,7 +136,7 @@ export default function Hero() {
       </div>
 
       {/* Horizontal flow illustration — Card → Connector → Card → ... */}
-      <div ref={containerRef} className="relative mx-auto w-full max-w-7xl px-6 pb-12 lg:px-10 mt-15">
+      <div ref={containerRef} className="relative mx-auto mt-15 w-full max-w-7xl px-4 pb-10 sm:px-6 lg:px-10 lg:pb-12">
         {/* Glow behind cards */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-[radial-gradient(ellipse_at_50%_100%,rgba(37,99,235,0.10),transparent_60%),radial-gradient(ellipse_at_70%_90%,rgba(16,185,129,0.10),transparent_50%)]" />
 
@@ -141,15 +144,15 @@ export default function Hero() {
         <div className="relative flex flex-col items-stretch gap-4 pt-8 md:flex-row md:items-stretch md:gap-0">
 
           {/* Card 1 */}
-          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/50 bg-white/70 px-5 pb-5 pt-10 shadow-lg ring-1 ring-[var(--color-border)]/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
+          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/50 bg-white/70 px-5 pb-5 pt-10 shadow-lg ring-1 ring-border/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2">
               <Image src="/bulb.png" alt="Rough Idea" width={42} height={42} className="drop-shadow-md" />
             </div>
-            <span className="font-[family-name:var(--font-nunito)] text-lg font-semibold text-heading">Rough Idea</span>
+            <span className="font-(family-name:--font-nunito) text-lg font-semibold text-heading">Rough Idea</span>
           </div>
 
           {/* Connector 1→2 */}
-          <div className="hidden shrink-0 self-center overflow-visible md:flex">
+          {!isMobile && <div className="hidden shrink-0 self-center overflow-visible md:flex">
           <svg data-connector aria-hidden="true" viewBox="0 0 80 40" className="mx-1 h-10 w-20 overflow-visible">
             <defs>
               <linearGradient id="cg1" x1="0" x2="1" y1="0" y2="0">
@@ -164,18 +167,18 @@ export default function Hero() {
             <path d="M2 20 C20 10, 60 30, 78 20" fill="none" stroke="url(#cg1)" strokeWidth="2.5" strokeLinecap="round" />
             <circle cx="0" cy="0" r="10" fill="url(#pg1)" opacity="0" />
           </svg>
-          </div>
+          </div>}
 
           {/* Card 2 */}
-          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/55 bg-white/75 px-5 pb-5 pt-10 shadow-lg ring-1 ring-[var(--color-border)]/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
+          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/55 bg-white/75 px-5 pb-5 pt-10 shadow-lg ring-1 ring-border/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2">
               <Image src="/validated idea.png" alt="Validation" width={82} height={82} className="drop-shadow-md" />
             </div>
-            <span className="font-[family-name:var(--font-nunito)] text-lg font-semibold text-heading">Validation</span>
+            <span className="font-(family-name:--font-nunito) text-lg font-semibold text-heading">Validation</span>
           </div>
 
           {/* Connector 2→3 */}
-          <div className="hidden shrink-0 self-center overflow-visible md:flex">
+          {!isMobile && <div className="hidden shrink-0 self-center overflow-visible md:flex">
           <svg data-connector aria-hidden="true" viewBox="0 0 80 40" className="mx-1 h-10 w-20 overflow-visible">
             <defs>
               <linearGradient id="cg2" x1="0" x2="1" y1="0" y2="0">
@@ -190,18 +193,18 @@ export default function Hero() {
             <path d="M2 20 C20 30, 60 10, 78 20" fill="none" stroke="url(#cg2)" strokeWidth="2.5" strokeLinecap="round" />
             <circle cx="0" cy="0" r="10" fill="url(#pg2)" opacity="0" />
           </svg>
-          </div>
+          </div>}
 
           {/* Card 3 */}
-          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/55 bg-white/75 px-5 pb-5 pt-10 shadow-lg ring-1 ring-[var(--color-border)]/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
+          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/55 bg-white/75 px-5 pb-5 pt-10 shadow-lg ring-1 ring-border/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2">
               <Image src="/plan.png" alt="MVP Plan" width={42} height={42} className="drop-shadow-md" />
             </div>
-            <span className="font-[family-name:var(--font-nunito)] text-lg font-semibold text-heading">MVP Plan</span>
+            <span className="font-(family-name:--font-nunito) text-lg font-semibold text-heading">MVP Plan</span>
           </div>
 
           {/* Connector 3→4 */}
-          <div className="hidden shrink-0 self-center overflow-visible md:flex">
+          {!isMobile && <div className="hidden shrink-0 self-center overflow-visible md:flex">
           <svg data-connector aria-hidden="true" viewBox="0 0 80 40" className="mx-1 h-10 w-20 overflow-visible">
             <defs>
               <linearGradient id="cg3" x1="0" x2="1" y1="0" y2="0">
@@ -216,14 +219,14 @@ export default function Hero() {
             <path d="M2 20 C20 10, 60 30, 78 20" fill="none" stroke="url(#cg3)" strokeWidth="2.5" strokeLinecap="round" />
             <circle cx="0" cy="0" r="10" fill="url(#pg3)" opacity="0" />
           </svg>
-          </div>
+          </div>}
 
           {/* Card 4 */}
-          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/60 bg-white/80 px-5 pb-5 pt-10 shadow-lg ring-1 ring-[var(--color-border)]/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
+          <div data-card className="relative group flex-1 flex flex-col items-center rounded-2xl border border-white/60 bg-white/80 px-5 pb-5 pt-10 shadow-lg ring-1 ring-border/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl">
             <div className="absolute -top-5 left-1/2 -translate-x-1/2">
               <Image src="/launch.png" alt="Pitch & Launch" width={42} height={42} className="drop-shadow-md" />
             </div>
-            <span className="font-[family-name:var(--font-nunito)] text-lg font-semibold text-heading">Pitch & Launch</span>
+            <span className="font-(family-name:--font-nunito) text-lg font-semibold text-heading">Pitch & Launch</span>
           </div>
 
         </div>
