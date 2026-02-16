@@ -7,6 +7,7 @@ import { ArrowRight, ArrowLeft, Check, Loader2 } from "lucide-react";
 import gsap from "gsap";
 import { submitIdea } from "@/app/actions/ideas";
 import { useIdeaStore } from "@/lib/stores/idea-store";
+import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 
 // Step definitions
 const STEPS = [
@@ -84,6 +85,7 @@ export default function OnboardingPage() {
   const [formData, setFormData] = useState<Record<number, string>>({});
   const [stage, setStage] = useState<string | null>(null);
   const setIdea = useIdeaStore((state) => state.setIdea);
+  const { isMobile } = useBreakpoints();
 
   // Animate step transition
   const animateStep = useCallback(
@@ -190,8 +192,9 @@ export default function OnboardingPage() {
 
       {/* Full-screen form */}
       <div className="flex min-h-screen">
-        {/* Progress chain  left side (hidden on mobile) */}
-        <div className="hidden w-20 shrink-0 items-center justify-center py-16 sm:flex lg:w-28">
+        {/* Progress chain  left side */}
+        {!isMobile && (
+        <div className="w-20 shrink-0 items-center justify-center py-16 sm:flex lg:w-28">
           <div className="relative flex flex-col items-center gap-0">
             {STEPS.map((s, i) => (
               <div key={s.id} className="flex flex-col items-center">
@@ -203,11 +206,11 @@ export default function OnboardingPage() {
                     </div>
                   ) : i === currentStep ? (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-md shadow-primary/25 transition-all duration-300">
-                      <span className="text-xs font-bold">{i}</span>
+                      <span className="text-xs font-bold">{i + 1}</span>
                     </div>
                   ) : (
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-(--color-border) bg-white text-muted transition-all duration-300">
-                      <span className="text-xs font-medium">{i}</span>
+                      <span className="text-xs font-medium">{i + 1}</span>
                     </div>
                   )}
                 </div>
@@ -225,22 +228,35 @@ export default function OnboardingPage() {
             ))}
           </div>
         </div>
+        )}
 
         {/* Form content  centered */}
-        <div className="flex flex-1 flex-col items-center justify-center px-6 py-16 sm:px-10 lg:px-16">
+        <div className="flex flex-1 flex-col items-center justify-center px-4 py-20 sm:px-10 lg:px-16">
           {/* Mobile step indicator */}
-          <div className="mb-8 flex items-center gap-2 sm:hidden">
-            <span className="text-sm font-medium text-muted">
+          {isMobile && (
+          <div className="mb-8 w-full max-w-2xl">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="text-sm font-medium text-muted">
               Step {currentStep + 1} of {STEPS.length}
-            </span>
+              </span>
+              <span className="text-sm font-semibold text-heading">
+                {Math.round(((currentStep + 1) / STEPS.length) * 100)}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-slate-100">
+              <div
+                className="h-1.5 rounded-full bg-primary transition-all duration-300"
+                style={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+              />
+            </div>
           </div>
+          )}
 
           <div ref={stepRef} className="w-full max-w-2xl">
             {/* Welcome header  only on step 0 */}
             {currentStep === 0 && (
               <div className="mb-10">
-                            
-                <p className="mt-3 max-w-full text-base leading-relaxed text-body \">
+                <p className="mt-3 max-w-full text-base leading-relaxed text-body">
                   We&apos;ll walk you through a few focused questions to clarify
                   what you&apos;re building and why it matters.
                 </p>
@@ -304,12 +320,12 @@ export default function OnboardingPage() {
             )}
 
             {/* Navigation */}
-            <div className="mt-10 flex items-center gap-4">
+            <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               {currentStep > 0 && (
                 <button
                   onClick={handleBack}
                   disabled={isAnimating}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-(--color-border) bg-white px-6 text-sm font-medium text-body transition-colors hover:bg-background hover:text-heading disabled:opacity-50"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-(--color-border) bg-white px-6 text-sm font-medium text-body transition-colors hover:bg-background hover:text-heading disabled:opacity-50 sm:w-auto"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Back
@@ -319,7 +335,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleNext}
                   disabled={isAnimating}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-50"
+                  className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-primary-hover disabled:opacity-50 sm:w-auto"
                 >
                   Continue
                   <ArrowRight className="h-4 w-4" />
@@ -329,7 +345,7 @@ export default function OnboardingPage() {
                   <button
                     onClick={handleFinish}
                     disabled={isAnimating || isSubmitting}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-secondary-hover disabled:opacity-50"
+                    className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-secondary px-8 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-secondary-hover disabled:opacity-50 sm:w-auto"
                   >
                     {isSubmitting ? (
                       <>
