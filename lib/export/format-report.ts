@@ -1,16 +1,9 @@
-import type {
-  CompetitorProfile,
-  CompleteEvaluation,
-  StoredFeatureSimulation,
-  StoredMVPPlan,
-} from "@/lib/ai/types";
+import type { EvaluationResult } from "@/lib/ai/schemas";
+import type { StoredFeatureSimulation, StoredMVPPlan } from "@/lib/ai/types";
 
-export interface ReportPayload {
+interface FormatInput {
   ideaTitle: string;
-  stage: string;
-  versionNumber: number;
-  generatedAt: string;
-  ideaIntake: {
+  idea: {
     idea: string;
     targetUser: string;
     problem: string;
@@ -19,161 +12,97 @@ export interface ReportPayload {
     founderFit: string;
     stage: string;
   };
-  evaluation: CompleteEvaluation;
-  competitorProfiles: CompetitorProfile[];
+  evaluation: EvaluationResult;
   mvpPlan: StoredMVPPlan | null;
   featureSimulations: StoredFeatureSimulation[];
 }
 
-export function formatAsJSON(payload: ReportPayload) {
+export function formatAsMarkdown(input: FormatInput): string {
+  const lines: string[] = [];
+
+  lines.push(`# Forge Report — ${input.ideaTitle}`);
+  lines.push("");
+  lines.push(`- Stage: ${input.idea.stage}`);
+  lines.push(`- Forge Score: ${input.evaluation.overall_assessment.total_score}`);
+  lines.push(`- Verdict: ${input.evaluation.overall_assessment.verdict}`);
+  lines.push("");
+
+  lines.push("## Executive Summary");
+  lines.push(input.evaluation.overall_assessment.summary);
+  lines.push("");
+
+  lines.push("## Score Breakdown");
+  for (const [dimension, value] of Object.entries(input.evaluation.score_breakdown)) {
+    lines.push(`- **${dimension.replace(/_/g, " ")}**: ${value.score} — ${value.insight}`);
+  }
+  lines.push("");
+
+  lines.push("## Risk Profile");
+  for (const [risk, value] of Object.entries(input.evaluation.risk_profile)) {
+    lines.push(`- **${risk.replace(/_/g, " ")}**: ${value.level} (${value.score}) — ${value.reason}`);
+  }
+  lines.push("");
+
+  lines.push("## Recommended Next Steps");
+  input.evaluation.recommended_next_steps.forEach((step, index) => {
+    lines.push(`${index + 1}. ${step}`);
+  });
+  lines.push("");
+
+  if (input.mvpPlan) {
+    lines.push("## MVP Plan");
+    lines.push(`- Core Hypothesis: ${input.mvpPlan.coreHypothesis}`);
+    lines.push(`- Kill Condition: ${input.mvpPlan.killCondition}`);
+    lines.push(`- Estimated Timeline: ${input.mvpPlan.estimatedTimeline}`);
+    lines.push("");
+
+    lines.push("### Feature Prioritization");
+    input.mvpPlan.featurePrioritization.forEach((feature) => {
+      lines.push(
+        `- ${feature.feature} (${feature.priority}, ${feature.effort_estimate}) — ${feature.rationale}`
+      );
+    });
+    lines.push("");
+
+    lines.push("### Build Order");
+    input.mvpPlan.buildOrder.forEach((step) => {
+      lines.push(`${step.step}. ${step.action} — ${step.rationale}`);
+    });
+    lines.push("");
+  }
+
+  if (input.featureSimulations.length > 0) {
+    lines.push("## Feature Lab Results");
+    input.featureSimulations.slice(0, 10).forEach((simulation, index) => {
+      lines.push(
+        `${index + 1}. ${simulation.proposedFeature} — ${simulation.recommendation} (Δ ${simulation.netScoreChange}, projected ${simulation.projectedTotalScore})`
+      );
+      lines.push(`   ${simulation.recommendationRationale}`);
+    });
+    lines.push("");
+  }
+
+  lines.push("## Raw Intake");
+  lines.push(`- Idea: ${input.idea.idea}`);
+  lines.push(`- Target User: ${input.idea.targetUser}`);
+  lines.push(`- Problem: ${input.idea.problem}`);
+  lines.push(`- Alternatives: ${input.idea.alternatives}`);
+  lines.push(`- Timing: ${input.idea.timing}`);
+  lines.push(`- Founder Fit: ${input.idea.founderFit}`);
+
+  return lines.join("\n");
+}
+
+export function formatAsJSON(input: FormatInput) {
   return {
-    report: {
-      ideaTitle: payload.ideaTitle,
-      stage: payload.stage,
-      versionNumber: payload.versionNumber,
-      generatedAt: payload.generatedAt,
+    meta: {
+      title: input.ideaTitle,
+      stage: input.idea.stage,
+      generatedAt: new Date().toISOString(),
     },
-    evaluation: payload.evaluation,
-    competitorProfiles: payload.competitorProfiles,
-    mvpPlan: payload.mvpPlan,
-    featureSimulations: payload.featureSimulations,
-    ideaIntake: payload.ideaIntake,
+    idea: input.idea,
+    evaluation: input.evaluation,
+    mvpPlan: input.mvpPlan,
+    featureSimulations: input.featureSimulations,
   };
-}
-
-function formatDimensionRows(payload: ReportPayload): string {
-  const dimensions = payload.evaluation.score_breakdown;
-  const rows: Array<{ label: string; score: number; insight: string; weight: string }> = [
-    {
-      label: "Problem Strength",
-      score: dimensions.problem_strength.score,
-      insight: dimensions.problem_strength.insight,
-      weight: "25%",
-    },
-    {
-      label: "Market Opportunity",
-      score: dimensions.market_opportunity.score,
-      insight: dimensions.market_opportunity.insight,
-      weight: "20%",
-    },
-    {
-      label: "Differentiation Strength",
-      score: dimensions.differentiation_strength.score,
-      insight: dimensions.differentiation_strength.insight,
-      weight: "20%",
-    },
-    {
-      label: "Timing Readiness",
-      score: dimensions.timing_readiness.score,
-      insight: dimensions.timing_readiness.insight,
-      weight: "15%",
-    },
-    {
-      label: "Founder Leverage",
-      score: dimensions.founder_leverage.score,
-      insight: dimensions.founder_leverage.insight,
-      weight: "10%",
-    },
-    {
-      label: "Execution Feasibility",
-      score: dimensions.execution_feasibility.score,
-      insight: dimensions.execution_feasibility.insight,
-      weight: "10%",
-    },
-  ];
-
-  return rows
-    .map((row) => `- **${row.label}**: ${row.score}/100 (Weight ${row.weight}) — ${row.insight}`)
-    .join("\n");
-}
-
-export function formatAsMarkdown(payload: ReportPayload): string {
-  const verdict = payload.evaluation.overall_assessment.verdict;
-  const reportDate = new Date(payload.generatedAt).toLocaleString();
-
-  const riskRows = Object.entries(payload.evaluation.risk_profile)
-    .map(([key, value]) => {
-      const label = key.replace(/_/g, " ");
-      return `- **${label}**: ${value.level.toUpperCase()} (${value.score}/100) — ${value.reason}`;
-    })
-    .join("\n");
-
-  const competitorRows = payload.competitorProfiles.length
-    ? payload.competitorProfiles
-        .map(
-          (competitor) =>
-            `- **${competitor.name}** (${competitor.stage}, ${competitor.threatLevel} threat): ${competitor.description}\n  - Differentiation: ${competitor.howYouDiffer}`
-        )
-        .join("\n")
-    : "- No structured competitor profiles available.";
-
-  const nextSteps = payload.evaluation.recommended_next_steps
-    .map((step) => `- ${step}`)
-    .join("\n");
-
-  const mvpSection = payload.mvpPlan
-    ? [
-        "## MVP Plan",
-        `- **Core Hypothesis**: ${payload.mvpPlan.coreHypothesis}`,
-        `- **Kill Condition**: ${payload.mvpPlan.killCondition}`,
-        `- **Estimated Timeline**: ${payload.mvpPlan.estimatedTimeline}`,
-        "- **Build Order**:",
-        ...payload.mvpPlan.buildOrder.map(
-          (step) => `  - ${step.step}. ${step.action} — ${step.rationale}`
-        ),
-      ].join("\n")
-    : "## MVP Plan\n- MVP plan not generated yet.";
-
-  const simulationSection = payload.featureSimulations.length
-    ? [
-        "## Feature Lab Results",
-        ...payload.featureSimulations.slice(0, 10).map(
-          (simulation, index) =>
-            `${index + 1}. **${simulation.proposedFeature}**\n   - Recommendation: ${simulation.recommendation}\n   - Net score impact: ${simulation.netScoreChange}\n   - Rationale: ${simulation.recommendationRationale}`
-        ),
-      ].join("\n")
-    : "## Feature Lab Results\n- No simulations saved yet.";
-
-  return [
-    `# Forge Report — ${payload.ideaTitle}`,
-    `Generated: ${reportDate}`,
-    `Version: V${payload.versionNumber}`,
-    "",
-    "## Cover",
-    `- **Stage**: ${payload.stage}`,
-    `- **Forge Score**: ${payload.evaluation.overall_assessment.total_score}/100`,
-    `- **Verdict**: ${verdict}`,
-    "",
-    "## Executive Summary",
-    payload.evaluation.overall_assessment.summary,
-    "",
-    "## Score Breakdown",
-    formatDimensionRows(payload),
-    "",
-    "## Risk Profile",
-    riskRows,
-    "",
-    "## Competitive Landscape",
-    competitorRows,
-    "",
-    "## Strategic Analysis",
-    `- **Primary Strengths**: ${payload.evaluation.strategic_analysis.primary_strengths.join(", ")}`,
-    `- **Key Weaknesses**: ${payload.evaluation.strategic_analysis.key_weaknesses.join(", ")}`,
-    "",
-    "## Recommended Next Steps",
-    nextSteps,
-    "",
-    mvpSection,
-    "",
-    simulationSection,
-    "",
-    "## Appendix: Raw Intake",
-    `- **Idea**: ${payload.ideaIntake.idea}`,
-    `- **Target User**: ${payload.ideaIntake.targetUser}`,
-    `- **Problem**: ${payload.ideaIntake.problem}`,
-    `- **Alternatives**: ${payload.ideaIntake.alternatives}`,
-    `- **Timing**: ${payload.ideaIntake.timing}`,
-    `- **Founder Fit**: ${payload.ideaIntake.founderFit}`,
-    `- **Stage**: ${payload.ideaIntake.stage}`,
-  ].join("\n");
 }

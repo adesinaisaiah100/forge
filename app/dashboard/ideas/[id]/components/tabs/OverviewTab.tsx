@@ -2,26 +2,30 @@
 
 import { useRouter } from "next/navigation";
 import { EvaluationResult } from "@/lib/ai/schemas";
-import { CompetitorProfile, IdeaDocument } from "@/lib/ai/types";
+import { CompetitorProfile, IdeaDocument, StoredFeatureSimulation, StoredMVPPlan } from "@/lib/ai/types";
 import { ArrowRight, Target, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TabId } from "../IdeaWorkspace";
 import { InlineEditField } from "./InlineEditField";
 import { ShareButton } from "./ShareButton";
+import { ExportDropdown } from "./ExportDropdown";
 
 interface Props {
    ideaId: string;
+   ideaTitle: string;
    idea: Pick<
       IdeaDocument,
       "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage"
    >;
   ideaVersionId: string | null;
   evaluation: EvaluationResult;
-   competitorProfiles: CompetitorProfile[];
+  mvpPlan: StoredMVPPlan | null;
+  featureSimulations: StoredFeatureSimulation[];
+  competitorProfiles: CompetitorProfile[];
   moveToTab: (tab: TabId) => void;
 }
 
-export function OverviewTab({ ideaId, idea, ideaVersionId, evaluation, competitorProfiles, moveToTab }: Props) {
+export function OverviewTab({ ideaId, ideaTitle, idea, ideaVersionId, evaluation, mvpPlan, featureSimulations, competitorProfiles, moveToTab }: Props) {
    const router = useRouter();
   const { overall_assessment } = evaluation;
 
@@ -69,6 +73,14 @@ export function OverviewTab({ ideaId, idea, ideaVersionId, evaluation, competito
             )} />
          </div>
       </div>
+
+         <ExportDropdown
+            ideaTitle={ideaTitle}
+            idea={idea}
+            evaluation={evaluation}
+            mvpPlan={mvpPlan}
+            featureSimulations={featureSimulations}
+         />
 
       <ShareButton ideaVersionId={ideaVersionId} />
 
