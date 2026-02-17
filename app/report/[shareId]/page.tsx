@@ -1,10 +1,41 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getPublicReport } from "@/app/actions/share";
 import { cn } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ shareId: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { shareId } = await params;
+  const report = await getPublicReport(shareId);
+
+  if (!report) {
+    return {
+      title: "Forge Report",
+      description: "Public Forge startup idea report",
+    };
+  }
+
+  const title = `Forge Evaluation: ${report.title}`;
+  const description = `Score ${report.totalScore}/100 • ${report.verdict} — ${report.executiveSummary}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function PublicReportPage({ params }: Props) {
@@ -15,14 +46,23 @@ export default async function PublicReportPage({ params }: Props) {
     notFound();
   }
 
-  const dimensionRows = Object.entries(report.scoreBreakdown).map(([key, value]) => ({
+  const scoreBreakdown = report.scoreBreakdown as Record<
+    string,
+    { score: number; insight: string }
+  >;
+  const riskProfile = report.riskProfile as Record<
+    string,
+    { level: string; reason: string }
+  >;
+
+  const dimensionRows = Object.entries(scoreBreakdown).map(([key, value]) => ({
     key,
     label: key.replace(/_/g, " "),
     score: value.score,
     insight: value.insight,
   }));
 
-  const riskRows = Object.entries(report.riskProfile).map(([key, value]) => ({
+  const riskRows = Object.entries(riskProfile).map(([key, value]) => ({
     key,
     label: key.replace(/_/g, " "),
     level: value.level,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Copy, Link2, Loader2, Lock, Share2, Unlock } from "lucide-react";
 
 interface Props {
@@ -18,6 +18,21 @@ export function ShareButton({ ideaVersionId }: Props) {
     if (typeof window === "undefined") return shareUrl;
     return `${window.location.origin}${shareUrl}`;
   }, [shareUrl]);
+
+  useEffect(() => {
+    const loadStatus = async () => {
+      if (!ideaVersionId) return;
+      try {
+        const { getShareStatus } = await import("@/app/actions/share");
+        const status = await getShareStatus(ideaVersionId);
+        setIsPublic(status.isPublic);
+        setShareUrl(status.url);
+      } catch {
+      }
+    };
+
+    void loadStatus();
+  }, [ideaVersionId]);
 
   const handleGenerate = async () => {
     if (!ideaVersionId) return;
@@ -94,7 +109,7 @@ export function ShareButton({ ideaVersionId }: Props) {
           className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPublic ? <Unlock className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
-          {isPublic ? "Public" : "Private"}
+          {isPublic ? "Make private" : "Make public"}
         </button>
 
         {absoluteUrl ? (

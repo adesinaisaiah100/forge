@@ -372,7 +372,7 @@ Status: 🚧 In progress
 
 ## Phase D — Export + Share
 
-Status: 🚧 In progress
+Status: ✅ Completed
 
 ### D1. Export workflow completed
 
@@ -409,5 +409,36 @@ Status: 🚧 In progress
 
 ### Phase D remaining
 
-- Optional share preview OG metadata and revoke UX polish.
-- Optional export/share visual refinements in Overview header.
+- None required for scope. Phase D deliverables are complete.
+
+---
+
+### D3. Share status hydration + OG metadata polish completed
+
+#### What was done
+- Added share-status fetch action so Overview share controls initialize from persisted state.
+- Updated share button UX labels for explicit public/private toggles.
+- Added `generateMetadata` on public report route for Open Graph and Twitter previews.
+
+#### Files updated
+- `app/actions/share.ts`
+- `app/dashboard/ideas/[id]/components/tabs/ShareButton.tsx`
+- `app/report/[shareId]/page.tsx`
+
+---
+
+### D4. Export workflow restoration completed
+
+#### What was done
+- Restored report formatting and download helpers.
+- Restored `ExportDropdown` and re-integrated it into Overview.
+- Wired export context (idea, evaluation, MVP, simulations) through workspace props.
+
+#### Files created
+- `lib/export/format-report.ts`
+- `lib/export/download.ts`
+- `app/dashboard/ideas/[id]/components/tabs/ExportDropdown.tsx`
+
+#### Files updated
+- `app/dashboard/ideas/[id]/components/tabs/OverviewTab.tsx`
+- `app/dashboard/ideas/[id]/components/IdeaWorkspace.tsx`

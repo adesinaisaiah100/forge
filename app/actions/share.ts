@@ -5,6 +5,19 @@ import { Query } from "node-appwrite";
 import { createAdminClient, createSessionClient } from "@/lib/appwrite/server";
 import { COLLECTIONS, DATABASE_ID } from "@/lib/appwrite/config";
 
+export interface PublicReportData {
+  shareId: string;
+  title: string;
+  stage: string;
+  totalScore: number;
+  verdict: "GO" | "REFINE" | "KILL";
+  executiveSummary: string;
+  scoreBreakdown: Record<string, { score: number; insight: string }>;
+  riskProfile: Record<string, { level: string; reason: string; score: number }>;
+  recommendedNextSteps: string[];
+  createdAt: string;
+}
+
 function createShareId() {
   return crypto.randomUUID().replace(/-/g, "").slice(0, 20);
 }
@@ -90,7 +103,36 @@ export async function toggleShareLink(ideaVersionId: string, isPublic: boolean) 
   };
 }
 
-export async function getPublicReport(shareId: string) {
+export async function getShareStatus(ideaVersionId: string) {
+  const { databases } = await getAuthenticatedClient();
+
+  const evaluationResult = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTIONS.EVALUATIONS,
+    [
+      Query.equal("ideaVersionId", ideaVersionId),
+      Query.orderDesc("$createdAt"),
+      Query.limit(1),
+    ]
+  );
+
+  if (evaluationResult.documents.length === 0) {
+    return {
+      shareId: null,
+      isPublic: false,
+      url: null,
+    };
+  }
+
+  const evaluation = evaluationResult.documents[0];
+  return {
+    shareId: evaluation.shareId ?? null,
+    isPublic: typeof evaluation.isPublic === "boolean" ? evaluation.isPublic : false,
+    url: evaluation.shareId ? `/report/${evaluation.shareId}` : null,
+  };
+}
+
+export async function getPublicReport(shareId: string): Promise<PublicReportData | null> {
   const { databases } = createAdminClient();
 
   const evaluationResult = await databases.listDocuments(
@@ -137,14 +179,14 @@ export async function getPublicReport(shareId: string) {
 
   return {
     shareId,
-    title: idea.title,
-    stage: idea.stage,
-    totalScore: evaluation.totalScore,
-    verdict: evaluation.verdict,
-    executiveSummary: evaluation.executiveSummary,
+    title: String(idea.title ?? "Untitled"),
+    stage: String(idea.stage ?? "Unknown"),
+    totalScore: Number(evaluation.totalScore ?? 0),
+    verdict: (evaluation.verdict ?? "REFINE") as "GO" | "REFINE" | "KILL",
+    executiveSummary: String(evaluation.executiveSummary ?? ""),
     scoreBreakdown,
     riskProfile,
-    recommendedNextSteps,
-    createdAt: evaluation.$createdAt,
+    recommendedNextSteps: Array.isArray(recommendedNextSteps) ? recommendedNextSteps : [],
+    createdAt: String(evaluation.$createdAt ?? new Date().toISOString()),
   };
 }
