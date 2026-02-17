@@ -36,6 +36,7 @@ export interface IdeaVersion {
   baseIdeaText: string;
   featureList: string[]; // Stored as JSON string in Appwrite, parsed on read
   parentVersionId: string | null;
+  diffSummary?: string | null;
 }
 
 // ──────────────────────────────────────────────

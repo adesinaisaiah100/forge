@@ -27,6 +27,7 @@
  * baseIdeaText      string(5000)  required   — snapshot of the idea text at this version
  * featureList       string(10000) optional   — JSON array of features
  * parentVersionId   string(255)   optional   — null for V1, references prior version
+ * diffSummary       string(5000)  optional   — concise summary of score/verdict shifts vs prior version
  *
  * ─── Collection: evaluations ───
  * ideaVersionId         string(255)    required

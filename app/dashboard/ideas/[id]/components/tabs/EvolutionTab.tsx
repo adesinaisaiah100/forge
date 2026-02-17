@@ -296,10 +296,13 @@ export function EvolutionTab({ versions, evaluations, currentVersionId }: Props)
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
-          {getRiskShiftText(
-            selectedEntry.evaluation.riskProfile,
-            selectedEntry.previousEvaluation?.riskProfile ?? null
-          )}
+          <p>{selectedEntry.version.diffSummary ?? "No diff summary available yet."}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            {getRiskShiftText(
+              selectedEntry.evaluation.riskProfile,
+              selectedEntry.previousEvaluation?.riskProfile ?? null
+            )}
+          </p>
         </div>
 
         <div className="space-y-2">

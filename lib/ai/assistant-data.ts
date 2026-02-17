@@ -51,6 +51,7 @@ function toPlainVersion(doc: any): IdeaVersion {
     baseIdeaText: doc.baseIdeaText,
     featureList,
     parentVersionId: doc.parentVersionId ?? null,
+    diffSummary: doc.diffSummary ?? null,
   };
 }
 

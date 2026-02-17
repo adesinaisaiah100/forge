@@ -24,6 +24,39 @@ interface AssistantToolsConfig {
   ideaId: string;
 }
 
+function buildDiffSummary(args: {
+  previousTotalScore: number | null;
+  nextTotalScore: number;
+  previousVerdict: "GO" | "REFINE" | "KILL" | null;
+  nextVerdict: "GO" | "REFINE" | "KILL";
+  strongestGainDimension: string | null;
+  strongestGainDelta: number | null;
+  weakestDropDimension: string | null;
+  weakestDropDelta: number | null;
+}): string {
+  const scoreShift =
+    args.previousTotalScore == null
+      ? `Score established at ${args.nextTotalScore}`
+      : `Score ${args.previousTotalScore} → ${args.nextTotalScore}`;
+
+  const verdictShift =
+    args.previousVerdict == null
+      ? `Verdict set to ${args.nextVerdict}`
+      : `Verdict ${args.previousVerdict} → ${args.nextVerdict}`;
+
+  const gain =
+    args.strongestGainDimension && args.strongestGainDelta != null
+      ? `Top gain: ${args.strongestGainDimension} (+${args.strongestGainDelta}).`
+      : "No positive dimension movement.";
+
+  const drop =
+    args.weakestDropDimension && args.weakestDropDelta != null
+      ? `Main drop: ${args.weakestDropDimension} (${args.weakestDropDelta}).`
+      : "No dimension regressed.";
+
+  return `${scoreShift}. ${verdictShift}. ${gain} ${drop}`;
+}
+
 export function createAssistantTools(config: AssistantToolsConfig) {
   return {
     re_evaluate_idea: tool({
@@ -144,12 +177,44 @@ export function createAssistantTools(config: AssistantToolsConfig) {
           };
         });
 
+        const positiveDeltas = scoreDiff
+          .filter((entry) => entry.delta != null && entry.delta > 0)
+          .sort((a, b) => (b.delta ?? 0) - (a.delta ?? 0));
+
+        const negativeDeltas = scoreDiff
+          .filter((entry) => entry.delta != null && entry.delta < 0)
+          .sort((a, b) => (a.delta ?? 0) - (b.delta ?? 0));
+
+        const diffSummary = buildDiffSummary({
+          previousTotalScore: state.evaluation?.totalScore ?? null,
+          nextTotalScore: evaluation.overall_assessment.total_score,
+          previousVerdict: state.evaluation?.verdict ?? null,
+          nextVerdict: evaluation.overall_assessment.verdict,
+          strongestGainDimension: positiveDeltas[0]?.dimension ?? null,
+          strongestGainDelta: positiveDeltas[0]?.delta ?? null,
+          weakestDropDimension: negativeDeltas[0]?.dimension ?? null,
+          weakestDropDelta: negativeDeltas[0]?.delta ?? null,
+        });
+
+        try {
+          await client.databases.updateDocument(
+            DATABASE_ID,
+            COLLECTIONS.IDEA_VERSIONS,
+            newVersion.$id,
+            {
+              diffSummary,
+            }
+          );
+        } catch {
+        }
+
         return {
           versionId: newVersion.$id,
           versionNumber: nextVersionNumber,
           totalScore: evaluation.overall_assessment.total_score,
           verdict: evaluation.overall_assessment.verdict,
           confidence: evaluation.overall_assessment.confidence_level,
+          diffSummary,
           scoreDiff,
         };
       },
