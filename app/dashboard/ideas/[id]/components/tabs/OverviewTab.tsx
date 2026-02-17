@@ -1,19 +1,39 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { EvaluationResult } from "@/lib/ai/schemas";
-import { CompetitorProfile } from "@/lib/ai/types";
+import { CompetitorProfile, IdeaDocument } from "@/lib/ai/types";
 import { ArrowRight, Target, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TabId } from "../IdeaWorkspace";
+import { InlineEditField } from "./InlineEditField";
 
 interface Props {
+   ideaId: string;
+   idea: Pick<
+      IdeaDocument,
+      "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage"
+   >;
   evaluation: EvaluationResult;
    competitorProfiles: CompetitorProfile[];
   moveToTab: (tab: TabId) => void;
 }
 
-export function OverviewTab({ evaluation, competitorProfiles, moveToTab }: Props) {
+export function OverviewTab({ ideaId, idea, evaluation, competitorProfiles, moveToTab }: Props) {
+   const router = useRouter();
   const { overall_assessment } = evaluation;
+
+   const handleReEvaluate = async (
+      fieldName: "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage",
+      value: string
+   ) => {
+      const { reEvaluateWithChange } = await import("@/app/actions/ideas");
+      const result = await reEvaluateWithChange(ideaId, fieldName, value);
+      setTimeout(() => {
+         router.refresh();
+      }, 1200);
+      return result;
+   };
 
   return (
     <div className="space-y-8">
@@ -130,6 +150,48 @@ export function OverviewTab({ evaluation, competitorProfiles, moveToTab }: Props
                </div>
            </div>
       </div>
+
+         <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/40 p-4 sm:p-6">
+            <div>
+               <h3 className="text-lg font-bold text-slate-900">Quick Re-Evaluation</h3>
+               <p className="mt-1 text-sm text-slate-500">
+                  Edit one field and run a fresh evaluation in one step.
+               </p>
+            </div>
+
+            <div className="grid gap-4">
+               <InlineEditField
+                  label="Core Idea"
+                  value={idea.idea}
+                  onReEvaluate={(value) => handleReEvaluate("idea", value)}
+               />
+               <InlineEditField
+                  label="Target User"
+                  value={idea.targetUser}
+                  onReEvaluate={(value) => handleReEvaluate("targetUser", value)}
+               />
+               <InlineEditField
+                  label="Problem"
+                  value={idea.problem}
+                  onReEvaluate={(value) => handleReEvaluate("problem", value)}
+               />
+               <InlineEditField
+                  label="Alternatives"
+                  value={idea.alternatives}
+                  onReEvaluate={(value) => handleReEvaluate("alternatives", value)}
+               />
+               <InlineEditField
+                  label="Timing"
+                  value={idea.timing}
+                  onReEvaluate={(value) => handleReEvaluate("timing", value)}
+               />
+               <InlineEditField
+                  label="Founder Fit"
+                  value={idea.founderFit}
+                  onReEvaluate={(value) => handleReEvaluate("founderFit", value)}
+               />
+            </div>
+         </div>
 
          {competitorProfiles.length > 0 && (
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

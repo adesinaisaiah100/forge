@@ -79,6 +79,16 @@ export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, 
       >
         {activeTab === 'overview' && (
           <OverviewTab
+            ideaId={idea.$id}
+            idea={{
+              idea: idea.idea,
+              targetUser: idea.targetUser,
+              problem: idea.problem,
+              alternatives: idea.alternatives,
+              timing: idea.timing,
+              founderFit: idea.founderFit,
+              stage: idea.stage,
+            }}
             evaluation={evaluation}
             competitorProfiles={competitorProfiles}
             moveToTab={setActiveTab}

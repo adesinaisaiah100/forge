@@ -313,7 +313,34 @@ Status: 🚧 In progress
 
 ## Phase C — Quick Re-eval + Comparison
 
-Status: ⏸ Not started
+Status: 🚧 In progress
+
+### C1. Quick re-evaluation inline workflow completed
+
+#### What was done
+- Added `reEvaluateWithChange` server action for one-field pivots.
+- New flow creates next version, runs full evaluation, persists it, and updates `ideas.currentVersionId`.
+- Added inline edit/re-evaluate UI in Overview with per-run score diff feedback and workspace refresh.
+
+#### Files created
+- `app/dashboard/ideas/[id]/components/tabs/InlineEditField.tsx`
+
+#### Files updated
+- `app/actions/ideas.ts`
+- `app/dashboard/ideas/[id]/components/tabs/OverviewTab.tsx`
+- `app/dashboard/ideas/[id]/components/IdeaWorkspace.tsx`
+
+#### Important logic
+- Inline action supports: `idea`, `targetUser`, `problem`, `alternatives`, `timing`, `founderFit`, `stage`.
+- Score deltas are returned dimension-by-dimension and rendered immediately.
+- After response, client refresh syncs sidebar score/verdict and current version context.
+
+---
+
+### Phase C remaining
+
+- C2: Multi-idea comparison route (`/dashboard/compare`) with radar overlay.
+- Dashboard multi-select + compare CTA.
 
 ## Phase D — Export + Share
 

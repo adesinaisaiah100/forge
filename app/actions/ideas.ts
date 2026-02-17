@@ -4,6 +4,7 @@ import { createSessionClient } from "@/lib/appwrite/server";
 import { DATABASE_ID, COLLECTIONS } from "@/lib/appwrite/config";
 import { cookies } from "next/headers";
 import { ID, Query, Permission, Role } from "node-appwrite";
+import { generateEvaluation } from "@/lib/ai/orchestrator";
 import type {
   IdeaIntake,
   IdeaDocument,
@@ -404,4 +405,108 @@ export async function getEvaluation(ideaVersionId: string): Promise<StoredEvalua
   } catch {
     return null;
   }
+}
+
+export async function reEvaluateWithChange(
+  ideaId: string,
+  fieldName: keyof Pick<
+    IdeaDocument,
+    "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage"
+  >,
+  newValue: string
+) {
+  const { databases, user } = await getAuthenticatedClient();
+
+  const normalizedValue = newValue.trim();
+  if (!normalizedValue) {
+    throw new Error("Updated value cannot be empty.");
+  }
+
+  const ideaDoc = await databases.getDocument(DATABASE_ID, COLLECTIONS.IDEAS, ideaId);
+  const idea = toPlainIdeaDoc(ideaDoc);
+
+  const currentVersion = idea.currentVersionId
+    ? await databases.getDocument(DATABASE_ID, COLLECTIONS.IDEA_VERSIONS, idea.currentVersionId)
+    : null;
+
+  const currentEvaluation = idea.currentVersionId
+    ? await getEvaluation(idea.currentVersionId)
+    : null;
+
+  const mergedIdea: IdeaIntake = {
+    idea: fieldName === "idea" ? normalizedValue : idea.idea,
+    targetUser: fieldName === "targetUser" ? normalizedValue : idea.targetUser,
+    problem: fieldName === "problem" ? normalizedValue : idea.problem,
+    alternatives: fieldName === "alternatives" ? normalizedValue : idea.alternatives,
+    timing: fieldName === "timing" ? normalizedValue : idea.timing,
+    founderFit: fieldName === "founderFit" ? normalizedValue : idea.founderFit,
+    stage: fieldName === "stage" ? normalizedValue : idea.stage,
+  };
+
+  const versionsResult = await databases.listDocuments(
+    DATABASE_ID,
+    COLLECTIONS.IDEA_VERSIONS,
+    [
+      Query.equal("ideaId", ideaId),
+      Query.orderDesc("versionNumber"),
+      Query.limit(1),
+    ]
+  );
+
+  const latestVersion = versionsResult.documents[0];
+  const nextVersionNumber = (latestVersion?.versionNumber ?? 0) + 1;
+
+  const versionDoc = await databases.createDocument(
+    DATABASE_ID,
+    COLLECTIONS.IDEA_VERSIONS,
+    ID.unique(),
+    {
+      ideaId,
+      versionNumber: nextVersionNumber,
+      baseIdeaText: mergedIdea.idea,
+      featureList: JSON.stringify(
+        currentVersion?.featureList ? JSON.parse(currentVersion.featureList) : []
+      ),
+      parentVersionId: currentVersion?.$id ?? null,
+    },
+    [
+      Permission.read(Role.user(user.$id)),
+      Permission.update(Role.user(user.$id)),
+      Permission.delete(Role.user(user.$id)),
+    ]
+  );
+
+  const evaluation = await generateEvaluation(mergedIdea);
+
+  await saveEvaluation(versionDoc.$id, evaluation);
+
+  await databases.updateDocument(DATABASE_ID, COLLECTIONS.IDEAS, ideaId, {
+    ...mergedIdea,
+    currentVersionId: versionDoc.$id,
+  });
+
+  const dimensions = Object.keys(evaluation.score_breakdown) as Array<
+    keyof typeof evaluation.score_breakdown
+  >;
+
+  const scoreDiff = dimensions.map((dimension) => {
+    const previousScore = currentEvaluation?.scoreBreakdown?.[dimension]?.score ?? null;
+    const nextScore = evaluation.score_breakdown[dimension].score;
+    return {
+      dimension,
+      previousScore,
+      nextScore,
+      delta: previousScore == null ? null : nextScore - previousScore,
+    };
+  });
+
+  return {
+    fieldName,
+    value: normalizedValue,
+    versionId: versionDoc.$id,
+    versionNumber: nextVersionNumber,
+    totalScore: evaluation.overall_assessment.total_score,
+    verdict: evaluation.overall_assessment.verdict,
+    scoreDiff,
+  };
 }
