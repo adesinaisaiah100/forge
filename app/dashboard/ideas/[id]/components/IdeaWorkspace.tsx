@@ -6,6 +6,7 @@ import {
   Activity, 
   ShieldAlert, 
   Box,
+  Bot,
   FlaskConical,
   GitBranch,
   ChevronRight,
@@ -16,11 +17,12 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { CompleteEvaluation, IdeaDocument, IdeaVersion, StoredMVPPlan, StoredFeatureSimulation } from "@/lib/ai/types";
+import { CompetitorProfile, CompleteEvaluation, IdeaDocument, IdeaVersion, StoredMVPPlan, StoredFeatureSimulation } from "@/lib/ai/types";
 import Link from "next/link";
 
 // Tab Components
 import { OverviewTab } from "./tabs/OverviewTab";
+import { AssistantTab } from "./tabs/AssistantTab";
 import { EvaluationTab } from "./tabs/EvaluationTab";
 import { RisksTab } from "./tabs/RisksTab";
 import { MVPTab } from "./tabs/MVPTab";
@@ -31,6 +33,7 @@ import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 interface Props {
   idea: IdeaDocument;
   evaluation: CompleteEvaluation;
+  competitorProfiles: CompetitorProfile[];
   versions: IdeaVersion[];
   currentVersion: IdeaVersion | null;
   mvpPlan: StoredMVPPlan | null;
@@ -38,9 +41,9 @@ interface Props {
   isFirstRunEvaluation?: boolean;
 }
 
-export type TabId = 'overview' | 'evaluation' | 'risks' | 'mvp' | 'feature-lab' | 'evolution';
+export type TabId = 'overview' | 'assistant' | 'evaluation' | 'risks' | 'mvp' | 'feature-lab' | 'evolution';
 
-export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations, isFirstRunEvaluation = false }: Props) {
+export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, currentVersion, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations, isFirstRunEvaluation = false }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [mvpPlan, setMvpPlan] = useState<StoredMVPPlan | null>(initialMVPPlan);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -55,6 +58,7 @@ export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpP
 
   const menuItems: { id: TabId; label: string; icon: LucideIcon; ready: boolean }[] = [
     { id: 'overview', label: 'Overview', icon: LayoutGrid, ready: true },
+    { id: 'assistant', label: 'AI Assistant', icon: Bot, ready: true },
     { id: 'evaluation', label: 'Deep Analysis', icon: Activity, ready: true },
     { id: 'risks', label: 'Risk Profile', icon: ShieldAlert, ready: true },
     { id: 'mvp', label: 'MVP Plan', icon: Box, ready: true },
@@ -71,7 +75,21 @@ export function IdeaWorkspace({ idea, evaluation, versions, currentVersion, mvpP
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.2 }}
       >
-        {activeTab === 'overview' && <OverviewTab evaluation={evaluation} moveToTab={setActiveTab} />}
+        {activeTab === 'overview' && (
+          <OverviewTab
+            evaluation={evaluation}
+            competitorProfiles={competitorProfiles}
+            moveToTab={setActiveTab}
+          />
+        )}
+        {activeTab === 'assistant' && (
+          <AssistantTab
+            ideaId={idea.$id}
+            ideaVersionId={currentVersion?.$id ?? null}
+            ideaTitle={idea.title}
+            evaluation={evaluation}
+          />
+        )}
         {activeTab === 'evaluation' && (
           <EvaluationTab
             data={evaluation.score_breakdown}

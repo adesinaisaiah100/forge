@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Crosshair,
   Skull,
@@ -33,7 +33,89 @@ export function MVPTab({
 }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [featureStatuses, setFeatureStatuses] = useState<
+    Record<string, "pending" | "completed">
+  >({});
+  const [updatingTaskKey, setUpdatingTaskKey] = useState<string | null>(null);
   const { isMobile } = useBreakpoints();
+
+  useEffect(() => {
+    setFeatureStatuses(mvpPlan?.featureStatuses ?? {});
+  }, [mvpPlan]);
+
+  const buildFeatureTaskKey = (index: number) => `feature-${index}`;
+  const buildOrderTaskKey = (index: number) => `build-${index}`;
+
+  const allTaskKeys = useMemo(() => {
+    if (!mvpPlan) return [] as string[];
+
+    const featureKeys = mvpPlan.featurePrioritization.map((_, index) =>
+      buildFeatureTaskKey(index)
+    );
+    const buildKeys = mvpPlan.buildOrder.map((_, index) =>
+      buildOrderTaskKey(index)
+    );
+
+    return [...featureKeys, ...buildKeys];
+  }, [mvpPlan]);
+
+  const completedTaskCount = useMemo(() => {
+    return allTaskKeys.filter(
+      (key) => (featureStatuses[key] ?? "pending") === "completed"
+    ).length;
+  }, [allTaskKeys, featureStatuses]);
+
+  const totalTaskCount = allTaskKeys.length;
+  const completionPercent =
+    totalTaskCount > 0
+      ? Math.round((completedTaskCount / totalTaskCount) * 100)
+      : 0;
+
+  const isTaskCompleted = (taskKey: string) =>
+    (featureStatuses[taskKey] ?? "pending") === "completed";
+
+  const toggleTaskStatus = async (taskKey: string) => {
+    if (!mvpPlan || updatingTaskKey) return;
+
+    const previousStatus: "pending" | "completed" = isTaskCompleted(taskKey)
+      ? "completed"
+      : "pending";
+
+    const resolvedNextStatus: "pending" | "completed" =
+      previousStatus === "completed" ? "pending" : "completed";
+
+    setUpdatingTaskKey(taskKey);
+    setError(null);
+
+    try {
+      setFeatureStatuses((current) => ({
+        ...current,
+        [taskKey]: resolvedNextStatus,
+      }));
+
+      const { updateMVPTaskStatus } = await import("@/app/actions/mvp");
+      const updated = await updateMVPTaskStatus(
+        mvpPlan.$id,
+        taskKey,
+        resolvedNextStatus
+      );
+
+      setFeatureStatuses(updated.featureStatuses ?? {});
+    } catch (toggleError) {
+      setFeatureStatuses((current) => ({
+        ...current,
+        [taskKey]: previousStatus,
+      }));
+
+      setError(
+        toggleError instanceof Error
+          ? toggleError.message
+          : "Failed to update task status."
+      );
+    } finally {
+      setUpdatingTaskKey(null);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!ideaVersionId) return;
@@ -160,6 +242,27 @@ export function MVPTab({
         </div>
       </div>
 
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center justify-between gap-3 text-sm">
+          <p className="font-medium text-slate-700">
+            {completedTaskCount}/{totalTaskCount} tasks completed
+          </p>
+          <p className="font-semibold text-slate-900">{completionPercent}%</p>
+        </div>
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full bg-slate-900 transition-all duration-300"
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
+      </div>
+
+      {error && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+          {error}
+        </div>
+      )}
+
       {/* 1. Core Hypothesis + Kill Condition — side by side */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Hypothesis Card */}
@@ -281,6 +384,7 @@ export function MVPTab({
             </thead>
             <tbody>
               {mvpPlan.featurePrioritization.map((item, i) => {
+                const taskKey = buildFeatureTaskKey(i);
                 const style = priorityStyles[item.priority] ?? {
                   bg: "bg-slate-50",
                   text: "text-slate-600",
@@ -291,8 +395,24 @@ export function MVPTab({
                     key={i}
                     className="border-b border-slate-50 last:border-b-0 hover:bg-slate-50/50 transition-colors"
                   >
-                    <td className="px-6 py-3 font-medium text-slate-900">
-                      {item.feature}
+                    <td className="px-6 py-3">
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={isTaskCompleted(taskKey)}
+                          disabled={updatingTaskKey === taskKey}
+                          onChange={() => toggleTaskStatus(taskKey)}
+                          className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-300"
+                        />
+                        <span
+                          className={cn(
+                            "font-medium text-slate-900",
+                            isTaskCompleted(taskKey) && "text-slate-400 line-through"
+                          )}
+                        >
+                          {item.feature}
+                        </span>
+                      </label>
                     </td>
                     <td className="px-6 py-3">
                       <span
@@ -326,6 +446,7 @@ export function MVPTab({
           </table>
         </div> : <div className="mt-4 space-y-3 px-4 pb-4">
           {mvpPlan.featurePrioritization.map((item, i) => {
+            const taskKey = buildFeatureTaskKey(i);
             const style = priorityStyles[item.priority] ?? {
               bg: "bg-slate-50",
               text: "text-slate-600",
@@ -334,7 +455,23 @@ export function MVPTab({
             return (
               <div key={i} className="rounded-xl border border-slate-100 bg-slate-50/50 p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="font-medium text-slate-900">{item.feature}</p>
+                  <label className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      checked={isTaskCompleted(taskKey)}
+                      disabled={updatingTaskKey === taskKey}
+                      onChange={() => toggleTaskStatus(taskKey)}
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-300"
+                    />
+                    <p
+                      className={cn(
+                        "font-medium text-slate-900",
+                        isTaskCompleted(taskKey) && "text-slate-400 line-through"
+                      )}
+                    >
+                      {item.feature}
+                    </p>
+                  </label>
                   <span
                     className={cn(
                       "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold",
@@ -381,7 +518,9 @@ export function MVPTab({
           </div>
 
           <div className="space-y-0">
-            {mvpPlan.buildOrder.map((step, i) => (
+            {mvpPlan.buildOrder.map((step, i) => {
+              const taskKey = buildOrderTaskKey(i);
+              return (
               <div key={i} className="relative flex gap-4 pb-6 last:pb-0">
                 {/* Vertical line */}
                 {i < mvpPlan.buildOrder.length - 1 && (
@@ -392,13 +531,29 @@ export function MVPTab({
                   {step.step}
                 </div>
                 <div className="pt-0.5">
-                  <p className="font-medium text-slate-900">{step.action}</p>
+                  <label className="flex items-start gap-2">
+                    <input
+                      type="checkbox"
+                      checked={isTaskCompleted(taskKey)}
+                      disabled={updatingTaskKey === taskKey}
+                      onChange={() => toggleTaskStatus(taskKey)}
+                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-300"
+                    />
+                    <p
+                      className={cn(
+                        "font-medium text-slate-900",
+                        isTaskCompleted(taskKey) && "text-slate-400 line-through"
+                      )}
+                    >
+                      {step.action}
+                    </p>
+                  </label>
                   <p className="mt-1 text-sm text-slate-500">
                     {step.rationale}
                   </p>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         </motion.div>
 

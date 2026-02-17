@@ -46,6 +46,11 @@ function toPlainMVPPlan(doc: any): StoredMVPPlan {
         ? JSON.parse(doc.buildOrder)
         : doc.buildOrder,
     estimatedTimeline: doc.estimatedTimeline,
+    featureStatuses: doc.featureStatuses
+      ? (typeof doc.featureStatuses === "string"
+          ? JSON.parse(doc.featureStatuses)
+          : doc.featureStatuses)
+      : {},
   };
 }
 
@@ -90,6 +95,7 @@ export async function createMVPPlan(
       whatToIgnore: JSON.stringify(mvpPlan.what_to_ignore),
       buildOrder: JSON.stringify(mvpPlan.build_order),
       estimatedTimeline: mvpPlan.estimated_timeline,
+      featureStatuses: JSON.stringify({}),
       rawAiResponse: JSON.stringify(mvpPlan),
     },
     [
@@ -123,5 +129,60 @@ export async function getMVPPlan(
     return toPlainMVPPlan(result.documents[0]);
   } catch {
     return null;
+  }
+}
+
+// ──────────────────────────────────────────────
+// Update MVP task status (Phase A checklist persistence)
+// ──────────────────────────────────────────────
+export async function updateMVPTaskStatus(
+  planId: string,
+  taskKey: string,
+  status: "pending" | "completed"
+): Promise<StoredMVPPlan> {
+  try {
+    const { databases } = await getAuthenticatedClient();
+
+    const existingPlan = await databases.getDocument(
+      DATABASE_ID,
+      COLLECTIONS.MVP_PLANS,
+      planId
+    );
+
+    const currentFeatureStatuses = existingPlan.featureStatuses
+      ? typeof existingPlan.featureStatuses === "string"
+        ? JSON.parse(existingPlan.featureStatuses)
+        : existingPlan.featureStatuses
+      : {};
+
+    const nextFeatureStatuses = {
+      ...currentFeatureStatuses,
+      [taskKey]: status,
+    };
+
+    const updated = await databases.updateDocument(
+      DATABASE_ID,
+      COLLECTIONS.MVP_PLANS,
+      planId,
+      {
+        featureStatuses: JSON.stringify(nextFeatureStatuses),
+      }
+    );
+
+    return toPlainMVPPlan(updated);
+  } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof (error as { message?: unknown }).message === "string" &&
+      (error as { message: string }).message.includes("featureStatuses")
+    ) {
+      throw new Error(
+        "Phase A setup required: add the 'featureStatuses' string attribute to the 'mvp_plans' Appwrite collection."
+      );
+    }
+
+    throw error;
   }
 }
