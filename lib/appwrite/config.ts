@@ -74,4 +74,6 @@ export const COLLECTIONS = {
   EVALUATIONS: "evaluations",
   MVP_PLANS: "mvp_plans",
   FEATURE_SIMULATIONS: "feature_simulations",
+  CHAT_SESSIONS: "chat_sessions",
+  CHAT_MESSAGES: "chat_messages",
 } as const;

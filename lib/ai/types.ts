@@ -52,9 +52,23 @@ export interface StoredEvaluation {
   riskProfile: EvaluationResult["risk_profile"];
   competitiveLandscape: EvaluationResult["competitive_landscape"];
   strategicAnalysis: EvaluationResult["strategic_analysis"];
+  competitorProfiles?: CompetitorProfile[];
   executiveSummary: string;
   recommendedNextSteps: string[];
   rawAiResponse?: CompleteEvaluation | null;
+}
+
+export interface CompetitorProfile {
+  name: string;
+  url: string | null;
+  description: string;
+  stage: "Startup" | "Growth" | "Enterprise" | "Dead";
+  estimatedSize: string;
+  fundingInfo: string | null;
+  keyStrengths: string[];
+  keyWeaknesses: string[];
+  howYouDiffer: string;
+  threatLevel: "low" | "medium" | "high";
 }
 
 // ──────────────────────────────────────────────
@@ -96,6 +110,30 @@ export interface StoredMVPPlan {
     rationale: string;
   }[];
   estimatedTimeline: string;
+  featureStatuses?: Record<string, "pending" | "completed">;
+}
+
+export interface ChatSession {
+  $id: string;
+  $createdAt: string;
+  ideaId: string;
+  ideaVersionId: string;
+  title: string;
+  messageCount: number;
+  lastMessageAt: string;
+}
+
+export interface ChatMessage {
+  $id: string;
+  $createdAt: string;
+  sessionId: string;
+  ideaId: string;
+  ideaVersionId: string;
+  role: "user" | "assistant";
+  content: string;
+  toolCalls: string | null;
+  toolResults: string | null;
+  createdAt: string;
 }
 
 // ──────────────────────────────────────────────
