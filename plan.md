@@ -8,6 +8,86 @@
 
 ---
 
+## Execution Approval Plan (Phase-by-Phase)
+
+Use this section as the implementation gate. No code work should start for a phase until you approve it.
+
+### Phase 1 — Responsive Foundation + Landing + Onboarding
+
+**What we are building**
+- Shared responsive breakpoint system using `react-responsive`.
+- Fully responsive landing page sections (hero + marketing blocks + footer).
+- Fully responsive onboarding flow (progress, spacing, mobile-safe controls).
+
+**Deliverable**
+- Mobile-first UX from 320px to desktop for entry flow pages.
+
+**Status**
+- ✅ Completed and shipped.
+
+---
+
+### Phase 2 — Dashboard + Idea Workspace Responsive UX
+
+**What we are building**
+- Responsive dashboard header/list behavior for small screens.
+- Mobile workspace shell (top bar + slide-in navigation).
+- Desktop workspace shell retained (fixed sidebar).
+
+**Deliverable**
+- Consistent dashboard/workspace usability across phone, tablet, and desktop.
+
+**Status**
+- ✅ Completed and shipped.
+
+---
+
+### Phase 3 — Evaluation Tabs Responsive Refactor
+
+**What we are building**
+- Responsive tab layouts in Overview / Deep Analysis / MVP / Feature Lab.
+- Mobile-friendly rendering patterns (stacking, card mode, reduced visual density where needed).
+- Responsive readability for long-form strategic content.
+
+**Deliverable**
+- Evaluation experience is operable and readable on all major viewport classes.
+
+**Status**
+- ✅ Completed and shipped.
+
+---
+
+### Phase 4 — Conversational Core (Next Build Phase)
+
+**What we are building**
+- AI Assistant tab with streaming responses.
+- Three-tool system only (`re_evaluate_idea`, `refine_feature`, `update_idea_field`).
+- Compressed context injection + post-re-evaluation score-diff psychology loop.
+- Basic MVP checkboxes with persisted progress.
+
+**Deliverable**
+- Think → Evaluate → Refine → Re-evaluate loop becomes interactive and persistent.
+
+**Status**
+- ⏸ Pending your approval to start implementation.
+
+---
+
+### Phase 5 — Evolution + Comparison + Share Outputs
+
+**What we are building**
+- Evolution timeline UI + version diff visibility.
+- Quick re-evaluation workflow and side-by-side idea comparison.
+- Report export and shareable link output.
+
+**Deliverable**
+- Strong retention loop + growth/share surface.
+
+**Status**
+- ⏸ Not started.
+
+---
+
 ## Current State (What Exists)
 
 | Feature | Status |
@@ -57,6 +137,7 @@ Everything is ranked by impact on the core loop.
 ## Phase A — Conversational Core (~5-6 days)
 
 **What ships**: AI Assistant with 3 tools, compressed context injection, post-re-evaluation psychology layer, basic MVP checkboxes, enhanced Market Agent competitor profiles.
+And using google provider in the vercel ai sdk
 
 ### A.1 Data Model Changes
 
@@ -127,7 +208,7 @@ IDEA: [idea text]
 
 The assistant can request full detailed data (raw scoreBreakdown, riskProfile, strategicAnalysis) conversationally if the discussion requires depth — but the system prompt stays lean.
 
-**Model**: `groq('openai/gpt-oss-120b')` (same as evaluation pipeline — already integrated).
+**Model**: `gemini-flash-latest` (same as evaluation pipeline but with gemini — already integrated).
 
 **Streaming**: Vercel AI SDK `streamText()` for real-time responses.
 

@@ -20,6 +20,16 @@ interface MVPGeneratorInput {
   evaluation: StoredEvaluation;
 }
 
+function isJsonValidationFailure(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+
+  const message = error.message.toLowerCase();
+  return (
+    message.includes("failed to generate json") ||
+    message.includes("json_validate_failed")
+  );
+}
+
 /**
  * Identify the weakest scoring pillar from the evaluation breakdown.
  */
@@ -83,10 +93,7 @@ export async function generateMVPPlan(
   const weakestPillar = findWeakestPillar(input.evaluation.scoreBreakdown);
   const highestRisk = findHighestRisk(input.evaluation.riskProfile);
 
-  const result = await generateText({
-    model: groq("openai/gpt-oss-120b"),
-    output: Output.object({ schema: mvpPlanSchema }),
-    system: `You are a ruthless MVP architect. You design the leanest possible experiments that validate or kill startup ideas fast.
+  const systemPrompt = `You are a ruthless MVP architect. You design the leanest possible experiments that validate or kill startup ideas fast.
 
 PHILOSOPHY:
 - You are a strategic diagnostic system, not a helpful assistant.
@@ -109,8 +116,16 @@ RULES:
 - Feature prioritization: Maximum 8 features. At least 2 must be "Ignore".
 - Build order: Maximum 6 steps. Each step must be completable in 1–3 days.
 - what_to_ignore: List 3–5 things founders typically waste time on that are irrelevant for this MVP.
-- Be brutally honest. If the idea is weak, the MVP should be designed to prove it fast.`,
-    prompt: `Design a lean MVP plan for this startup idea:
+- Be brutally honest. If the idea is weak, the MVP should be designed to prove it fast.
+
+OUTPUT FORMAT REQUIREMENTS:
+- Return ONLY valid JSON that matches the required schema exactly.
+- Do not include markdown, prose, bullet prefixes, or code fences.
+- Every object in build_order must use exactly these keys: step, action, rationale.
+- Use plain ASCII punctuation in keys and structure.
+- Keep all strings valid JSON strings.`;
+
+  const userPrompt = `Design a lean MVP plan for this startup idea:
 
 IDEA: "${input.ideaText}"
 
@@ -130,12 +145,43 @@ STRATEGIC ANALYSIS:
 - Strengths: ${input.evaluation.strategicAnalysis.primary_strengths.join(", ")}
 - Weaknesses: ${input.evaluation.strategicAnalysis.key_weaknesses.join(", ")}
 
-Design the leanest possible MVP that validates or kills this idea.`,
-  });
+Design the leanest possible MVP that validates or kills this idea.`;
 
-  if (!result.output) {
-    throw new Error("Failed to generate MVP plan");
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const result = await generateText({
+        model: groq("openai/gpt-oss-120b"),
+        output: Output.object({ schema: mvpPlanSchema }),
+        temperature: 0,
+        system: systemPrompt,
+        prompt:
+          userPrompt +
+          "\n\nAttempt: " +
+          attempt +
+          "/3. JSON validity is mandatory.",
+      });
+
+      if (result.output) {
+        return result.output;
+      }
+
+      lastError = new Error("Model returned empty structured output.");
+    } catch (error) {
+      lastError = error;
+
+      if (!isJsonValidationFailure(error) || attempt === 3) {
+        break;
+      }
+    }
   }
 
-  return result.output;
+  if (lastError instanceof Error) {
+    throw new Error(
+      `MVP generation failed after 3 attempts. Root cause: ${lastError.message}`
+    );
+  }
+
+  throw new Error("MVP generation failed after 3 attempts.");
 }
