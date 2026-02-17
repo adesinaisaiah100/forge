@@ -243,7 +243,73 @@ This establishes stable persistence contracts before wiring UI and streaming. It
 
 ## Phase B — Evolution Timeline
 
-Status: ⏸ Not started
+Status: 🚧 In progress
+
+### B1. Evolution timeline + comparison panel completed
+
+#### What was done
+- Replaced Evolution placeholder with a working tab.
+- Added per-version timeline cards with score and verdict.
+- Added selected-version comparison panel with per-dimension score deltas.
+
+#### Files created
+- `app/dashboard/ideas/[id]/components/tabs/EvolutionTab.tsx`
+
+#### Files updated
+- `app/dashboard/ideas/[id]/components/IdeaWorkspace.tsx`
+- `app/dashboard/ideas/[id]/page.tsx`
+- `app/actions/ideas.ts`
+- `lib/ai/types.ts`
+
+---
+
+### B2. Evolution aggregate score chart completed
+
+#### What was done
+- Added score-over-time line chart for all evaluated versions.
+- Added momentum metrics (consecutive improvement streak + biggest gain dimension).
+
+#### Files updated
+- `app/dashboard/ideas/[id]/components/tabs/EvolutionTab.tsx`
+
+---
+
+### B3. Version diff summary persistence completed
+
+#### What was done
+- Added optional `idea_versions.diffSummary` support in app types.
+- Stored/retrieved version-level diff summaries for Evolution narrative context.
+- Added graceful fallback when the optional Appwrite attribute is not yet provisioned.
+
+#### Files updated
+- `lib/ai/types.ts`
+- `lib/ai/assistant-data.ts`
+- `lib/ai/assistant-tools.ts`
+- `app/actions/ideas.ts`
+- `app/dashboard/ideas/[id]/components/tabs/EvolutionTab.tsx`
+- `lib/appwrite/config.ts`
+
+---
+
+### B4. AI-generated diff summary pipeline completed
+
+#### What was done
+- Added dedicated pipeline to generate concise two-sentence version shift summaries.
+- Wired `re_evaluate_idea` to call the AI summary pipeline and persist result to `idea_versions.diffSummary`.
+- Added deterministic fallback summary so re-evaluation never fails if summary generation errors.
+
+#### Files created
+- `lib/ai/pipelines/version-diff-summary.ts`
+
+#### Files updated
+- `lib/ai/assistant-tools.ts`
+
+---
+
+### Phase B remaining
+
+- Optional decomposition into dedicated `VersionTimeline` and `ScoreComparisonPanel` components.
+- Optional design polish for timeline connectors and delta badges.
 
 ## Phase C — Quick Re-eval + Comparison
 
