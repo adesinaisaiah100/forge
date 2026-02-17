@@ -70,6 +70,9 @@ function toPlainEvaluation(doc: any): StoredEvaluation {
     riskProfile: typeof doc.riskProfile === "string" ? JSON.parse(doc.riskProfile) : doc.riskProfile,
     competitiveLandscape: typeof doc.competitiveLandscape === "string" ? JSON.parse(doc.competitiveLandscape) : doc.competitiveLandscape,
     strategicAnalysis: typeof doc.strategicAnalysis === "string" ? JSON.parse(doc.strategicAnalysis) : doc.strategicAnalysis,
+    competitorProfiles: doc.competitorProfiles
+      ? (typeof doc.competitorProfiles === "string" ? JSON.parse(doc.competitorProfiles) : doc.competitorProfiles)
+      : undefined,
     executiveSummary: doc.executiveSummary,
     recommendedNextSteps: typeof doc.recommendedNextSteps === "string" ? JSON.parse(doc.recommendedNextSteps) : doc.recommendedNextSteps,
     rawAiResponse: doc.rawAiResponse ? (typeof doc.rawAiResponse === "string" ? JSON.parse(doc.rawAiResponse) : doc.rawAiResponse) : null,
@@ -89,6 +92,9 @@ function toPlainMVPPlan(doc: any): StoredMVPPlan {
     whatToIgnore: typeof doc.whatToIgnore === "string" ? JSON.parse(doc.whatToIgnore) : doc.whatToIgnore,
     buildOrder: typeof doc.buildOrder === "string" ? JSON.parse(doc.buildOrder) : doc.buildOrder,
     estimatedTimeline: doc.estimatedTimeline,
+    featureStatuses: doc.featureStatuses
+      ? (typeof doc.featureStatuses === "string" ? JSON.parse(doc.featureStatuses) : doc.featureStatuses)
+      : {},
   };
 }
 
@@ -334,6 +340,9 @@ export async function saveEvaluation(
       riskProfile: JSON.stringify(evaluation.risk_profile),
       competitiveLandscape: JSON.stringify(evaluation.competitive_landscape),
       strategicAnalysis: JSON.stringify(evaluation.strategic_analysis),
+      competitorProfiles: JSON.stringify(
+        evaluation.raw_reports.market.competitor_profiles ?? []
+      ),
       executiveSummary: evaluation.overall_assessment.summary,
       recommendedNextSteps: JSON.stringify(evaluation.recommended_next_steps),
       rawAiResponse: JSON.stringify(evaluation),

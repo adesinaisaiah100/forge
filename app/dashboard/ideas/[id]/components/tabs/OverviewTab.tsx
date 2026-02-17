@@ -1,16 +1,18 @@
 "use client";
 
 import { EvaluationResult } from "@/lib/ai/schemas";
+import { CompetitorProfile } from "@/lib/ai/types";
 import { ArrowRight, Target, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TabId } from "../IdeaWorkspace";
 
 interface Props {
   evaluation: EvaluationResult;
+   competitorProfiles: CompetitorProfile[];
   moveToTab: (tab: TabId) => void;
 }
 
-export function OverviewTab({ evaluation, moveToTab }: Props) {
+export function OverviewTab({ evaluation, competitorProfiles, moveToTab }: Props) {
   const { overall_assessment } = evaluation;
 
   return (
@@ -128,6 +130,53 @@ export function OverviewTab({ evaluation, moveToTab }: Props) {
                </div>
            </div>
       </div>
+
+         {competitorProfiles.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+               <div className="mb-4 flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-bold text-slate-900">Competitor Profiles</h3>
+                  <button
+                     onClick={() => moveToTab("evaluation")}
+                     className="text-xs font-semibold text-slate-500 hover:text-slate-700"
+                  >
+                     See deep analysis
+                  </button>
+               </div>
+
+               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {competitorProfiles.slice(0, 6).map((competitor, index) => (
+                     <div
+                        key={`${competitor.name}-${index}`}
+                        className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
+                     >
+                        <div className="mb-2 flex items-start justify-between gap-2">
+                           <p className="font-semibold text-slate-900">{competitor.name}</p>
+                           <span
+                              className={cn(
+                                 "rounded-full px-2 py-0.5 text-[10px] font-bold uppercase",
+                                 competitor.threatLevel === "high"
+                                    ? "bg-rose-100 text-rose-700"
+                                    : competitor.threatLevel === "medium"
+                                       ? "bg-amber-100 text-amber-700"
+                                       : "bg-emerald-100 text-emerald-700"
+                              )}
+                           >
+                              {competitor.threatLevel}
+                           </span>
+                        </div>
+
+                        <p className="text-xs text-slate-500">{competitor.stage} • {competitor.estimatedSize}</p>
+                        <p className="mt-2 text-sm text-slate-600 line-clamp-3">{competitor.description}</p>
+
+                        <div className="mt-3 space-y-1">
+                           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">How You Differ</p>
+                           <p className="text-xs text-slate-700 line-clamp-3">{competitor.howYouDiffer}</p>
+                        </div>
+                     </div>
+                  ))}
+               </div>
+            </div>
+         )}
     </div>
   );
 }

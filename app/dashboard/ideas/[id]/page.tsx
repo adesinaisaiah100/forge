@@ -51,7 +51,7 @@ export default async function IdeaWorkspacePage({ params }: Props) {
         recommended_next_steps: currentEvaluation.recommendedNextSteps,
         raw_reports: {
           idea: { category: "", industry_vertical: "", core_value_prop: "", suggested_tech_stack: [], monetization_models: [] },
-          market: { problem_severity: "Medium (Frustrating)", market_saturation: "Competitive", existing_alternatives: [], differentiation_potential: "Moderate" },
+          market: { problem_severity: "Medium (Frustrating)", market_saturation: "Competitive", existing_alternatives: [], competitor_profiles: [], differentiation_potential: "Moderate" },
           timing: { macro_tailwinds: [], macro_headwinds: [], founder_market_fit: "Neutral", why_now_verdict: "Unknown" },
         },
       };
@@ -78,6 +78,11 @@ export default async function IdeaWorkspacePage({ params }: Props) {
     <IdeaWorkspace
       idea={ideaData}
       evaluation={evaluation}
+      competitorProfiles={
+        currentEvaluation?.competitorProfiles ??
+        evaluation.raw_reports.market.competitor_profiles ??
+        []
+      }
       versions={ideaData.versions}
       currentVersion={currentVersion}
       mvpPlan={ideaData.currentMVPPlan}

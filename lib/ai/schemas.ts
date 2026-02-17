@@ -12,6 +12,19 @@ export const ideaAnalysisSchema = z.object({
 export type IdeaAnalysis = z.infer<typeof ideaAnalysisSchema>;
 
 // --- Agent 2: Market Validation ---
+export const competitorProfileSchema = z.object({
+  name: z.string(),
+  url: z.string().nullable(),
+  description: z.string(),
+  stage: z.enum(["Startup", "Growth", "Enterprise", "Dead"]),
+  estimatedSize: z.string(),
+  fundingInfo: z.string().nullable(),
+  keyStrengths: z.array(z.string()),
+  keyWeaknesses: z.array(z.string()),
+  howYouDiffer: z.string(),
+  threatLevel: z.enum(["low", "medium", "high"]),
+});
+
 export const marketAnalysisSchema = z.object({
   problem_severity: z.enum(["Low (Nice to have)", "Medium (Frustrating)", "High (Burning pain)"]).describe("How painful is the problem for the user?"),
   market_saturation: z.enum(["Blue Ocean", "Competitive", "Oversaturated"]).describe("How crowded is the market?"),
@@ -21,6 +34,7 @@ export const marketAnalysisSchema = z.object({
       weakness: z.string(),
     })
   ).describe("List of main competitors and their specific weaknesses"),
+  competitor_profiles: z.array(competitorProfileSchema).describe("Structured competitor profiles for the top 2-5 relevant alternatives."),
   differentiation_potential: z.enum(["Hard", "Moderate", "Easy"]).describe("How hard is it to stand out?"),
 });
 

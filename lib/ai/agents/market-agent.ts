@@ -19,6 +19,16 @@ export const analyzeMarket = async (input: IdeaIntake) => {
     - Critical (don't sugarcoat saturation)
     - Specific (name actual competitors if they exist)
     - Objective (assess the severity of the pain point honestly)
+
+    Produce BOTH:
+    1) existing_alternatives: short competitor + weakness pairs
+    2) competitor_profiles: 2-5 structured profiles with threat levels and differentiation notes
+
+    Competitor profile quality bar:
+    - Use realistic competitor names and concise descriptions
+    - If URL/funding is unknown, return null
+    - Keep strengths/weaknesses concrete, not generic
+    - threatLevel must reflect direct competitive pressure on this idea
     
     Do not be a "yes-man". If the idea is in a crowded red ocean, say so.`,
     prompt: `Analyze the market for this startup idea: "${input.idea}"`,
