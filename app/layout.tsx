@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Inter, Manrope, Nunito, Advent_Pro } from "next/font/google";
 import "./globals.css";
 
@@ -54,6 +55,7 @@ export default function RootLayout({
         className={`${inter.variable} ${manrope.variable} ${nunito.variable} ${adventPro.variable} antialiased`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
