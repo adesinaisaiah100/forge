@@ -198,7 +198,7 @@ export function AssistantTab({ ideaId, ideaVersionId, ideaTitle, evaluation }: P
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3">
         <div className="flex items-center gap-2">
           <Bot className="h-4 w-4 text-slate-500" />
-          <h2 className="text-sm font-semibold text-slate-900">AI Assistant</h2>
+          <h2 className="text-sm font-semibold text-slate-900">Forge AI</h2>
         </div>
 
         <div className="flex items-center gap-2">

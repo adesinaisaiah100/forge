@@ -3,6 +3,7 @@ import { groq } from '@ai-sdk/groq';
 import { evaluatorWeights } from '../weights';
 import { aggregatorRawSchema, IdeaAnalysis, MarketAnalysis, TimingAnalysis, EvaluationResult, RawAggregatorOutput } from '../schemas';
 import { IdeaIntake } from '../types';
+import { google } from "@ai-sdk/google";
 
 interface AggregatorInput {
   idea: IdeaIntake;
@@ -77,7 +78,7 @@ function deriveVerdict(
 
 export const aggregateAnalysis = async ({ idea, ideaAnalysis, marketAnalysis, timingAnalysis }: AggregatorInput): Promise<EvaluationResult> => { // Explicit return type
   const result = await generateText({
-    model: groq('openai/gpt-oss-120b'), // Strongest model for synthesis
+    model: google('gemini-2.5-pro'), // Strongest model for synthesis
     output: Output.object({ schema: aggregatorRawSchema }),
     system: `You are the Lead Partner / Investment Committee at a top-tier VC firm.
     Your goal is to synthesize reports from your specialized analysts into a final, quantified investment memo.

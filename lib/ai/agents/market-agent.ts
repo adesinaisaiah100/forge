@@ -2,10 +2,11 @@ import { generateText, Output } from 'ai';
 import { groq } from '@ai-sdk/groq';
 import { marketAnalysisSchema } from '../schemas';
 import { IdeaIntake } from '../types';
+import { google } from "@ai-sdk/google";
 
 export const analyzeMarket = async (input: IdeaIntake) => {
   const result = await generateText({
-    model: groq('openai/gpt-oss-120b'),
+    model: google('gemini-flash-latest'),
     output: Output.object({ schema: marketAnalysisSchema }),
     system: `You are a ruthless Market Researcher.
     Your goal is to validate if the PROBLEM is real and if the MARKET is accessible.
