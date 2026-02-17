@@ -1,25 +1,39 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { EvaluationResult } from "@/lib/ai/schemas";
-import { CompetitorProfile, IdeaDocument } from "@/lib/ai/types";
+import { CompetitorProfile, CompleteEvaluation, IdeaDocument, StoredFeatureSimulation, StoredMVPPlan } from "@/lib/ai/types";
 import { ArrowRight, Target, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TabId } from "../IdeaWorkspace";
 import { InlineEditField } from "./InlineEditField";
+import { ExportDropdown } from "./ExportDropdown";
 
 interface Props {
    ideaId: string;
+    ideaTitle: string;
+    versionNumber: number;
    idea: Pick<
       IdeaDocument,
       "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage"
    >;
-  evaluation: EvaluationResult;
+   evaluation: CompleteEvaluation;
    competitorProfiles: CompetitorProfile[];
+   mvpPlan: StoredMVPPlan | null;
+   featureSimulations: StoredFeatureSimulation[];
   moveToTab: (tab: TabId) => void;
 }
 
-export function OverviewTab({ ideaId, idea, evaluation, competitorProfiles, moveToTab }: Props) {
+export function OverviewTab({
+   ideaId,
+   ideaTitle,
+   versionNumber,
+   idea,
+   evaluation,
+   competitorProfiles,
+   mvpPlan,
+   featureSimulations,
+   moveToTab,
+}: Props) {
    const router = useRouter();
   const { overall_assessment } = evaluation;
 
@@ -41,9 +55,23 @@ export function OverviewTab({ ideaId, idea, evaluation, competitorProfiles, move
       <div className="grid gap-6 md:grid-cols-2">
          {/* Introduction */}
          <div className="space-y-4">
-             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                Mission Control
-             </h2>
+                   <div className="flex items-center justify-between gap-3">
+                        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                           Mission Control
+                        </h2>
+                        <ExportDropdown
+                           payload={{
+                              ideaTitle,
+                              stage: idea.stage,
+                              versionNumber,
+                              ideaIntake: idea,
+                              evaluation,
+                              competitorProfiles,
+                              mvpPlan,
+                              featureSimulations,
+                           }}
+                        />
+                   </div>
              <p className="text-lg text-slate-600 leading-relaxed">
                 {overall_assessment.summary}
              </p>

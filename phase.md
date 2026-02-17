@@ -372,4 +372,35 @@ Status: 🚧 In progress
 
 ## Phase D — Export + Share
 
-Status: ⏸ Not started
+Status: 🚧 In progress
+
+### D1. Report export formatting + download workflow completed
+
+#### What was done
+- Added report formatter utilities for Markdown and JSON exports.
+- Added client download/copy helpers.
+- Added Overview export dropdown with actions:
+  - Download Markdown (`.md`)
+  - Download JSON (`.json`)
+  - Copy Markdown to clipboard
+
+#### Files created
+- `lib/export/format-report.ts`
+- `lib/export/download.ts`
+- `app/dashboard/ideas/[id]/components/tabs/ExportDropdown.tsx`
+
+#### Files updated
+- `app/dashboard/ideas/[id]/components/tabs/OverviewTab.tsx`
+- `app/dashboard/ideas/[id]/components/IdeaWorkspace.tsx`
+
+#### Important logic
+- Export payload includes idea intake, evaluation, competitor profiles, MVP plan, and feature simulation results.
+- Filename is normalized from idea title and current version.
+
+---
+
+### Phase D remaining
+
+- D2: Share link backend (`shareId`, `isPublic`) and actions.
+- D3: Public report page at `/report/[shareId]`.
+- D4: Share button flow in Overview.
