@@ -264,10 +264,22 @@ export async function getIdeaWithVersions(ideaId: string): Promise<IdeaWithVersi
 
     // Fetch evaluation for current version
     let currentEvaluation: StoredEvaluation | null = null;
+    let versionEvaluations: StoredEvaluation[] = [];
     let currentMVPPlan: StoredMVPPlan | null = null;
     let featureSimulations: StoredFeatureSimulation[] = [];
-    if (currentVersion) {
-      const [evalResult, mvpResult, simResult] = await Promise.all([
+    if (versions.length > 0) {
+      const versionIds = versions.map((version) => version.$id);
+
+      const [allEvalResult, evalResult, mvpResult, simResult] = await Promise.all([
+        databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.EVALUATIONS,
+          [
+            Query.equal("ideaVersionId", versionIds),
+            Query.orderDesc("$createdAt"),
+            Query.limit(200),
+          ]
+        ),
         databases.listDocuments(
           DATABASE_ID,
           COLLECTIONS.EVALUATIONS,
@@ -296,6 +308,19 @@ export async function getIdeaWithVersions(ideaId: string): Promise<IdeaWithVersi
           ]
         ),
       ]);
+
+      const latestEvaluationByVersion = new Map<string, StoredEvaluation>();
+      for (const evaluationDoc of allEvalResult.documents) {
+        const parsed = toPlainEvaluation(evaluationDoc);
+        if (!latestEvaluationByVersion.has(parsed.ideaVersionId)) {
+          latestEvaluationByVersion.set(parsed.ideaVersionId, parsed);
+        }
+      }
+
+      versionEvaluations = versions
+        .map((version) => latestEvaluationByVersion.get(version.$id) ?? null)
+        .filter((evaluation): evaluation is StoredEvaluation => evaluation !== null);
+
       if (evalResult.documents.length > 0) {
         currentEvaluation = toPlainEvaluation(evalResult.documents[0]);
       }
@@ -310,6 +335,7 @@ export async function getIdeaWithVersions(ideaId: string): Promise<IdeaWithVersi
       versions,
       currentVersion,
       currentEvaluation,
+      versionEvaluations,
       currentMVPPlan,
       featureSimulations,
     };

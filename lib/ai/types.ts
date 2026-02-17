@@ -173,6 +173,7 @@ export interface IdeaWithVersions extends IdeaDocument {
   versions: IdeaVersion[];
   currentVersion: IdeaVersion | null;
   currentEvaluation: StoredEvaluation | null;
+  versionEvaluations: StoredEvaluation[];
   currentMVPPlan: StoredMVPPlan | null;
   featureSimulations: StoredFeatureSimulation[];
 }

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { CompetitorProfile, CompleteEvaluation, IdeaDocument, IdeaVersion, StoredMVPPlan, StoredFeatureSimulation } from "@/lib/ai/types";
+import { CompetitorProfile, CompleteEvaluation, IdeaDocument, IdeaVersion, StoredEvaluation, StoredMVPPlan, StoredFeatureSimulation } from "@/lib/ai/types";
 import Link from "next/link";
 
 // Tab Components
@@ -27,6 +27,7 @@ import { EvaluationTab } from "./tabs/EvaluationTab";
 import { RisksTab } from "./tabs/RisksTab";
 import { MVPTab } from "./tabs/MVPTab";
 import { FeatureLabTab } from "./tabs/FeatureLabTab";
+import { EvolutionTab } from "./tabs/EvolutionTab";
 import { Skeleton, SkeletonText } from "./Skeletons";
 import { useBreakpoints } from "@/lib/hooks/use-breakpoints";
 
@@ -36,6 +37,7 @@ interface Props {
   competitorProfiles: CompetitorProfile[];
   versions: IdeaVersion[];
   currentVersion: IdeaVersion | null;
+  versionEvaluations: StoredEvaluation[];
   mvpPlan: StoredMVPPlan | null;
   featureSimulations: StoredFeatureSimulation[];
   isFirstRunEvaluation?: boolean;
@@ -43,7 +45,7 @@ interface Props {
 
 export type TabId = 'overview' | 'assistant' | 'evaluation' | 'risks' | 'mvp' | 'feature-lab' | 'evolution';
 
-export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, currentVersion, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations, isFirstRunEvaluation = false }: Props) {
+export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, currentVersion, versionEvaluations, mvpPlan: initialMVPPlan, featureSimulations: initialSimulations, isFirstRunEvaluation = false }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [mvpPlan, setMvpPlan] = useState<StoredMVPPlan | null>(initialMVPPlan);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -63,7 +65,7 @@ export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, 
     { id: 'risks', label: 'Risk Profile', icon: ShieldAlert, ready: true },
     { id: 'mvp', label: 'MVP Plan', icon: Box, ready: true },
     { id: 'feature-lab', label: 'Feature Lab', icon: FlaskConical, ready: true },
-    { id: 'evolution', label: 'Evolution', icon: GitBranch, ready: false },
+    { id: 'evolution', label: 'Evolution', icon: GitBranch, ready: true },
   ];
 
   const content = (
@@ -134,10 +136,10 @@ export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, 
         )}
 
         {activeTab === 'evolution' && (
-          <PlaceholderTab
-            title="Evolution Timeline"
-            description="Visualize your idea's evolution across versions. Track score deltas and strategic pivots."
-            phase="Phase 4"
+          <EvolutionTab
+            versions={versions}
+            evaluations={versionEvaluations}
+            currentVersionId={currentVersion?.$id ?? null}
           />
         )}
       </motion.div>
@@ -424,22 +426,6 @@ export function IdeaWorkspace({ idea, evaluation, competitorProfiles, versions, 
           </main>
         </div>
       )}
-    </div>
-  );
-}
-
-// ── Placeholder for unreleased tabs ──
-function PlaceholderTab({ title, description, phase }: { title: string; description: string; phase: string }) {
-  return (
-    <div className="flex h-[60vh] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 text-center">
-      <div className="rounded-full bg-white p-4 shadow-sm">
-        <Box className="h-8 w-8 text-slate-300" />
-      </div>
-      <h3 className="mt-4 text-lg font-medium text-slate-900">{title}</h3>
-      <p className="max-w-md mt-2 text-sm text-slate-500">{description}</p>
-      <span className="mt-3 inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-        {phase}
-      </span>
     </div>
   );
 }

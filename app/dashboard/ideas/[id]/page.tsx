@@ -85,6 +85,7 @@ export default async function IdeaWorkspacePage({ params }: Props) {
       }
       versions={ideaData.versions}
       currentVersion={currentVersion}
+      versionEvaluations={ideaData.versionEvaluations}
       mvpPlan={ideaData.currentMVPPlan}
       featureSimulations={ideaData.featureSimulations}
       isFirstRunEvaluation={isFirstRunEvaluation}
