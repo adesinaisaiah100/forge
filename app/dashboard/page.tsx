@@ -1,10 +1,10 @@
 import { getUserIdeas } from "@/app/actions/ideas";
-import { Plus, ArrowRight, Sparkles } from "lucide-react";
+import { Plus, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 import { LogoutButton } from "./LogoutButton";
 import Image from "next/image";
 import { Suspense } from "react";
+import { IdeasGrid } from "./components/IdeasGrid";
 
 /**
  * Dashboard — lists all user ideas with their latest evaluation status.
@@ -71,45 +71,7 @@ async function IdeasContent() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-lg font-bold text-slate-900">Your Ideas</h2>
-        <span className="text-sm text-slate-500">{ideas.length} idea{ideas.length !== 1 ? "s" : ""}</span>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ideas.map((idea) => (
-          <Link
-            key={idea.$id}
-            href={`/dashboard/ideas/${idea.$id}`}
-            className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-          >
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-                  {idea.stage}
-                </span>
-              </div>
-              <h3 className="font-bold text-slate-900 line-clamp-2 group-hover:text-slate-700 transition-colors">
-                {idea.title}
-              </h3>
-              <p className="mt-2 text-sm text-slate-500 line-clamp-2">
-                {idea.idea.substring(0, 120)}
-                {idea.idea.length > 120 ? "..." : ""}
-              </p>
-            </div>
-            <div className={cn(
-              "mt-4 flex items-center justify-between pt-4 border-t border-slate-100"
-            )}>
-              <span className="text-xs text-slate-400">
-                {new Date(idea.$createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-              </span>
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 group-hover:text-slate-900 transition-colors">
-                Open <ArrowRight className="h-3 w-3" />
-              </span>
-            </div>
-          </Link>
-        ))}
-      </div>
+      <IdeasGrid ideas={ideas} />
     </div>
   );
 }

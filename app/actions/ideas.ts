@@ -510,3 +510,32 @@ export async function reEvaluateWithChange(
     scoreDiff,
   };
 }
+
+export async function getIdeasForComparison(ideaIds: string[]) {
+  if (ideaIds.length === 0) {
+    return [];
+  }
+
+  const ideaData = await Promise.all(ideaIds.map((ideaId) => getIdeaWithVersions(ideaId)));
+
+  return ideaData
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
+    .map((entry) => ({
+      idea: {
+        $id: entry.$id,
+        title: entry.title,
+        stage: entry.stage,
+      },
+      currentVersion: entry.currentVersion,
+      evaluation: entry.currentEvaluation,
+    }))
+    .filter(
+      (
+        entry
+      ): entry is {
+        idea: { $id: string; title: string; stage: string };
+        currentVersion: IdeaVersion;
+        evaluation: StoredEvaluation;
+      } => entry.currentVersion !== null && entry.evaluation !== null
+    );
+}

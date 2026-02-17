@@ -340,7 +340,35 @@ Status: 🚧 In progress
 ### Phase C remaining
 
 - C2: Multi-idea comparison route (`/dashboard/compare`) with radar overlay.
-- Dashboard multi-select + compare CTA.
+
+---
+
+### C2. Idea comparison workflow completed
+
+#### What was done
+- Added dashboard idea multi-select with floating compare CTA.
+- Added comparison route with side-by-side score, verdict, dimension bars, risk highlights, and summaries.
+- Added multi-series radar overlay for selected ideas.
+
+#### Files created
+- `app/dashboard/components/IdeasGrid.tsx`
+- `app/dashboard/components/ComparisonRadarChart.tsx`
+- `app/dashboard/compare/page.tsx`
+
+#### Files updated
+- `app/dashboard/page.tsx`
+- `app/actions/ideas.ts`
+
+#### Important logic
+- Compare supports 2-4 selected ideas from dashboard cards.
+- Comparison page reads selected ids via query param and loads current-version evaluation snapshots.
+- Existing idea workspace flow remains unchanged.
+
+---
+
+### Phase C remaining
+
+- Optional AI recommendation paragraph on comparison page.
 
 ## Phase D — Export + Share
 
