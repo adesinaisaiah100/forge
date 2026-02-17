@@ -1,39 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { CompetitorProfile, CompleteEvaluation, IdeaDocument, StoredFeatureSimulation, StoredMVPPlan } from "@/lib/ai/types";
+import { EvaluationResult } from "@/lib/ai/schemas";
+import { CompetitorProfile, IdeaDocument } from "@/lib/ai/types";
 import { ArrowRight, Target, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { TabId } from "../IdeaWorkspace";
 import { InlineEditField } from "./InlineEditField";
-import { ExportDropdown } from "./ExportDropdown";
+import { ShareButton } from "./ShareButton";
 
 interface Props {
    ideaId: string;
-    ideaTitle: string;
-    versionNumber: number;
    idea: Pick<
       IdeaDocument,
       "idea" | "targetUser" | "problem" | "alternatives" | "timing" | "founderFit" | "stage"
    >;
-   evaluation: CompleteEvaluation;
+  ideaVersionId: string | null;
+  evaluation: EvaluationResult;
    competitorProfiles: CompetitorProfile[];
-   mvpPlan: StoredMVPPlan | null;
-   featureSimulations: StoredFeatureSimulation[];
   moveToTab: (tab: TabId) => void;
 }
 
-export function OverviewTab({
-   ideaId,
-   ideaTitle,
-   versionNumber,
-   idea,
-   evaluation,
-   competitorProfiles,
-   mvpPlan,
-   featureSimulations,
-   moveToTab,
-}: Props) {
+export function OverviewTab({ ideaId, idea, ideaVersionId, evaluation, competitorProfiles, moveToTab }: Props) {
    const router = useRouter();
   const { overall_assessment } = evaluation;
 
@@ -55,23 +43,9 @@ export function OverviewTab({
       <div className="grid gap-6 md:grid-cols-2">
          {/* Introduction */}
          <div className="space-y-4">
-                   <div className="flex items-center justify-between gap-3">
-                        <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                           Mission Control
-                        </h2>
-                        <ExportDropdown
-                           payload={{
-                              ideaTitle,
-                              stage: idea.stage,
-                              versionNumber,
-                              ideaIntake: idea,
-                              evaluation,
-                              competitorProfiles,
-                              mvpPlan,
-                              featureSimulations,
-                           }}
-                        />
-                   </div>
+             <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                Mission Control
+             </h2>
              <p className="text-lg text-slate-600 leading-relaxed">
                 {overall_assessment.summary}
              </p>
@@ -95,6 +69,8 @@ export function OverviewTab({
             )} />
          </div>
       </div>
+
+      <ShareButton ideaVersionId={ideaVersionId} />
 
       {/* 2. Progress Tracker */}
        <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">

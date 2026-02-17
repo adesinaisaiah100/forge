@@ -40,6 +40,8 @@
  * strategicAnalysis     string(5000)   required   — JSON
  * executiveSummary      string(5000)   required
  * recommendedNextSteps  string(5000)   required   — JSON array
+ * shareId               string(255)    optional   — public share token
+ * isPublic              boolean        optional   — public visibility flag
  * rawAiResponse         string(50000)  optional   — full raw JSON for debugging
  *
  * ─── Collection: mvp_plans ───

@@ -374,33 +374,40 @@ Status: 🚧 In progress
 
 Status: 🚧 In progress
 
-### D1. Report export formatting + download workflow completed
+### D1. Export workflow completed
 
 #### What was done
-- Added report formatter utilities for Markdown and JSON exports.
-- Added client download/copy helpers.
-- Added Overview export dropdown with actions:
-  - Download Markdown (`.md`)
-  - Download JSON (`.json`)
-  - Copy Markdown to clipboard
+- Added report export dropdown with Markdown and JSON output.
+- Added export formatting + download utility integration in Overview.
+
+---
+
+### D2. Share link backend + public report page completed
+
+#### What was done
+- Added share actions to generate/toggle public links for current evaluation version.
+- Added public report route at `/report/[shareId]` with score, verdict, dimensions, risks, and next steps.
+- Added Share button in Overview to generate/copy/toggle link visibility.
 
 #### Files created
-- `lib/export/format-report.ts`
-- `lib/export/download.ts`
-- `app/dashboard/ideas/[id]/components/tabs/ExportDropdown.tsx`
+- `app/actions/share.ts`
+- `app/dashboard/ideas/[id]/components/tabs/ShareButton.tsx`
+- `app/report/[shareId]/page.tsx`
 
 #### Files updated
 - `app/dashboard/ideas/[id]/components/tabs/OverviewTab.tsx`
 - `app/dashboard/ideas/[id]/components/IdeaWorkspace.tsx`
+- `app/actions/ideas.ts`
+- `lib/ai/types.ts`
+- `lib/appwrite/config.ts`
 
 #### Important logic
-- Export payload includes idea intake, evaluation, competitor profiles, MVP plan, and feature simulation results.
-- Filename is normalized from idea title and current version.
+- Public route fetches reports through admin client and only returns when `isPublic = true`.
+- Share link is tied to latest evaluation of current version (`ideaVersionId`).
 
 ---
 
 ### Phase D remaining
 
-- D2: Share link backend (`shareId`, `isPublic`) and actions.
-- D3: Public report page at `/report/[shareId]`.
-- D4: Share button flow in Overview.
+- Optional share preview OG metadata and revoke UX polish.
+- Optional export/share visual refinements in Overview header.

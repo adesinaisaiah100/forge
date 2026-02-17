@@ -77,6 +77,8 @@ function toPlainEvaluation(doc: any): StoredEvaluation {
       : undefined,
     executiveSummary: doc.executiveSummary,
     recommendedNextSteps: typeof doc.recommendedNextSteps === "string" ? JSON.parse(doc.recommendedNextSteps) : doc.recommendedNextSteps,
+    shareId: doc.shareId ?? null,
+    isPublic: typeof doc.isPublic === "boolean" ? doc.isPublic : false,
     rawAiResponse: doc.rawAiResponse ? (typeof doc.rawAiResponse === "string" ? JSON.parse(doc.rawAiResponse) : doc.rawAiResponse) : null,
   };
 }

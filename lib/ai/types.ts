@@ -56,6 +56,8 @@ export interface StoredEvaluation {
   competitorProfiles?: CompetitorProfile[];
   executiveSummary: string;
   recommendedNextSteps: string[];
+  shareId?: string | null;
+  isPublic?: boolean;
   rawAiResponse?: CompleteEvaluation | null;
 }
 
